@@ -50,7 +50,7 @@ public class IncrustGenerator
         }
         catch(Exception e)
         {
-            System.err.println("Unknown error ("+e.toString()+")");
+            Logger.LOGGER.error("Unknown error ("+e.toString()+")");
             return new Pixels();
         }
     }

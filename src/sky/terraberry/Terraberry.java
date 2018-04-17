@@ -20,11 +20,11 @@ public final class Terraberry
         try(FileInputStream inputStream=new FileInputStream(new File("Baloo-Regular.ttf")))
         {
             font=Font.createFont(Font.TRUETYPE_FONT,inputStream);
-            System.out.println("Font loaded successfully");
+            Logger.LOGGER.info("Font loaded successfully");
         }
         catch(IOException|FontFormatException e)
         {
-            System.err.println("Unable to load the font ("+e.toString()+")");
+            Logger.LOGGER.error("Unable to load the font ("+e.toString()+")");
         }
         FONT=font;
     }
@@ -36,7 +36,7 @@ public final class Terraberry
     public static void main(String[] args)
     {
         EpaperScreenManager.setEpaperScreenSize(EpaperScreenSize._2_13);
-        System.out.println("Starting "+Terraberry.class.getSimpleName()+"...");
+        Logger.LOGGER.info("Starting "+Terraberry.class.getSimpleName()+"...");
         try
         {
             List<Page> pages=new ArrayList<>();
@@ -45,8 +45,8 @@ public final class Terraberry
             Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
             long lastCompleteRefresh=System.currentTimeMillis();
             EpaperScreenManager.displayPage(currentPixels,false,false);
-            System.out.println("Display content successfully updated from page "+pages.get(0).getSerial()+" (total refresh)");
-            System.out.println(Terraberry.class.getSimpleName()+" is ready!");
+            Logger.LOGGER.info("Display content successfully updated from page "+pages.get(0).getSerial()+" (total refresh)");
+            Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is ready!");
             new Thread("pageUpdater")
             {
                 @Override
@@ -63,7 +63,7 @@ public final class Terraberry
                             }
                             catch(Throwable t)
                             {
-                                System.err.println("Unmanaged throwable during refresh ("+t.toString()+")");
+                                Logger.LOGGER.error("Unmanaged throwable during refresh ("+t.toString()+")");
                             }
                             Thread.sleep(Time.get(100).millisecond());
                         }
@@ -93,7 +93,7 @@ public final class Terraberry
                         Pixels pixels=currentlySelectedPageCopy==-1?newPixels:newPixels.incrustTransparentImage(new IncrustGenerator(pages.get(currentlySelectedPageCopy)).generateIncrust());
                         boolean fastMode=false;
                         EpaperScreenManager.displayPage(pixels,partialRefresh,fastMode);
-                        System.out.println("Display content successfully updated from page "+pages.get(currentPageCopy).getSerial()+" ("+(partialRefresh?"partial":"total")+" refresh)");
+                        Logger.LOGGER.info("Display content successfully updated from page "+pages.get(currentPageCopy).getSerial()+" ("+(partialRefresh?"partial":"total")+" refresh)");
                         currentPixels=newPixels;
                         lastDrawnIncrust=currentlySelectedPageCopy;
                     }
@@ -106,7 +106,7 @@ public final class Terraberry
         }
         catch(Exception e)
         {
-            System.err.println("Unknown error ("+e.toString()+")");
+            Logger.LOGGER.error("Unknown error ("+e.toString()+")");
         }
     }
 }

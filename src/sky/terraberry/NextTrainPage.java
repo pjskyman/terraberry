@@ -61,7 +61,7 @@ public class NextTrainPage extends AbstractPage
                 }
                 catch(IOException e)
                 {
-                    System.err.println("Unable to read Transilien access informations from the config file ("+e.toString()+")");
+                    Logger.LOGGER.error("Unable to read Transilien access informations from the config file ("+e.toString()+")");
                 }
                 String departC="";
                 String arriveeC="";
@@ -76,7 +76,7 @@ public class NextTrainPage extends AbstractPage
                 }
                 catch(IOException e)
                 {
-                    System.err.println("Unable to read Transilien configuration from the config file ("+e.toString()+")");
+                    Logger.LOGGER.error("Unable to read Transilien configuration from the config file ("+e.toString()+")");
                 }
 
                 List<Train> nextTrainsR=getTrains(departR,arriveeR,login,password);
@@ -190,11 +190,11 @@ public class NextTrainPage extends AbstractPage
 //                    ImageIO.write(sourceImage,"png",outputStream);
 //                }
                 pixels=new Pixels().writeImage(sourceImage);
-                System.out.println("Page "+getSerial()+" updated successfully");
+                Logger.LOGGER.info("Page "+getSerial()+" updated successfully");
             }
             catch(Exception e)
             {
-                System.err.println("Unknown error ("+e.toString()+")");
+                Logger.LOGGER.error("Unknown error ("+e.toString()+")");
             }
         }
         return this;
@@ -225,7 +225,7 @@ public class NextTrainPage extends AbstractPage
         connection=null;
         if(stringBuilder.toString().isEmpty())
             return new ArrayList<>(0);
-//        System.out.println("requestResponse="+stringBuilder.toString());
+//        Logger.LOGGER.info("requestResponse="+stringBuilder.toString());
         Element passagesElement=new SAXBuilder().build(new StringReader(stringBuilder.toString())).getRootElement();
         List<Train> trains=new ArrayList<>();
         ((List<Element>)passagesElement.getChildren("train")).forEach(trainElement->

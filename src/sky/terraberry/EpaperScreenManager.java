@@ -37,11 +37,11 @@ public class EpaperScreenManager
             }
             catch(IOException e)
             {
-                System.err.println("Unable to get SPI device ("+e.toString()+")");
+                Logger.LOGGER.error("Unable to get SPI device ("+e.toString()+")");
                 System.exit(1);
             }
             DEVICE=device;
-            System.out.println("SPI device successfully initialized");
+            Logger.LOGGER.info("SPI device successfully initialized");
             RESET=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_00,PinState.HIGH);
             DC=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);
             DC.setShutdownOptions(Boolean.TRUE,PinState.LOW);
@@ -53,7 +53,7 @@ public class EpaperScreenManager
 //                    Logger.LOGGER.debug("BUSY is now "+event.getState());
 //                }
 //            });
-            System.out.println("GPIO pins successfully initialized");
+            Logger.LOGGER.info("GPIO pins successfully initialized");
         }
         epaperScreenSize=EpaperScreenSize._2_9;
     }
@@ -158,7 +158,7 @@ public class EpaperScreenManager
         }
         catch(IOException e)
         {
-            System.err.println("Unable to initialize device or to send image to device ("+e.toString()+")");
+            Logger.LOGGER.error("Unable to initialize device or to send image to device ("+e.toString()+")");
         }
     }
 }
