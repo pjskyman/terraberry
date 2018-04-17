@@ -15,9 +15,11 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -79,18 +81,7 @@ public class NextTrainPage extends AbstractPage
 
                 List<Train> nextTrainsR=getTrains(departR,arriveeR,login,password);
                 List<Train> nextTrainsC=getTrains(departC,arriveeC,login,password);
-                nextTrainsC.sort((o1,o2)->
-                {
-                    boolean b1=o1.getMission().startsWith("E");
-                    boolean b2=o2.getMission().startsWith("E");
-                    if(b1==b2)
-                        return o1.getTime().compareTo(o2.getTime());
-                    else
-                        if(b1)
-                            return -1;
-                        else
-                            return 1;
-                });
+//                nextTrainsC.sort((o1,o2)->o1.getTime().compareTo(o2.getTime()));
 //                nextTrainsR.add(new Train("18:07","GAMA","Coucou",""));
 //                nextTrainsR.add(new Train("18:13","LARO","Coucou",""));
 //                nextTrainsR.add(new Train("18:32","GAME","Coucou",""));
@@ -98,8 +89,8 @@ public class NextTrainPage extends AbstractPage
 //                nextTrainsR.add(new Train("19:07","GAMA","Coucou",""));
 //                nextTrainsR.add(new Train("19:16","KUMO","Coucou",""));
 //                nextTrainsR.add(new Train("19:32","GAME","Coucou",""));
-//                nextTrainsC.add(new Train("18:01","ELAO","Coucou",""));
-//                nextTrainsC.add(new Train("18:18","ELAO","Coucou",""));
+//                nextTrainsC.add(new Train("18:01","ELAO","Coucou","Retardé"));
+//                nextTrainsC.add(new Train("18:18","ELAO","Coucou","Supprimé"));
 //                nextTrainsC.add(new Train("18:31","ELAO","Coucou",""));
 //                nextTrainsC.add(new Train("18:46","ELAO","Coucou",""));
 //                nextTrainsC.add(new Train("19:01","ELBA","Coucou",""));
@@ -116,28 +107,63 @@ public class NextTrainPage extends AbstractPage
                 g2d.drawLine(124,6,124,128);
                 g2d.drawLine(125,6,125,128);
                 g2d.drawLine(126,6,126,128);
-                Font baseFont=Terraberry.FONT.deriveFont(20f).deriveFont(AffineTransform.getScaleInstance(.85d,1d));
-                Font bigFont=Terraberry.FONT.deriveFont(30f);
-                Font ipFont=Terraberry.FONT.deriveFont(10f);
+                Font bigTimeFont=Terraberry.FONT.deriveFont(30f);
+                Font mediumTimeFont=Terraberry.FONT.deriveFont(20f);
+                Font missionFont=Terraberry.FONT.deriveFont(20f).deriveFont(AffineTransform.getScaleInstance(.85d,1d));
+                Font infoFont=Terraberry.FONT.deriveFont(12f).deriveFont(AffineTransform.getScaleInstance(1d,1.1d));
                 for(int i=0;i<nextTrainsR.size();i++)
                 {
-                    g2d.setFont(bigFont);
-                    String time=nextTrainsR.get(i).getTime();
-                    int timeWidth=(int)Math.ceil(bigFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+                    Train trainR=nextTrainsR.get(i);
+                    g2d.setFont(bigTimeFont);
+                    String time=trainR.getTime()+(trainR.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
+                    int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
                     g2d.drawString(time,1,20*(i+1)+5);
-                    g2d.setFont(baseFont);
-                    g2d.drawString(nextTrainsR.get(i).getMission(),1+timeWidth+3,20*(i+1)+2);
+                    if(trainR.getAdditionalMessage().toLowerCase().contains("suppr"))
+                    {
+                        g2d.drawLine(0,20*(i+1)+5-11,timeWidth+2,20*(i+1)+5-11);
+                        g2d.drawLine(0,20*(i+1)+5-10,timeWidth+2,20*(i+1)+5-10);
+                        g2d.drawLine(0,20*(i+1)+5-9,timeWidth+2,20*(i+1)+5-9);
+                    }
+                    g2d.setFont(missionFont);
+                    g2d.drawString(trainR.getMission(),1+timeWidth+3,20*(i+1)+2);
                 }
+                int currentY=5;
                 for(int i=0;i<nextTrainsC.size();i++)
                 {
-                    g2d.setFont(bigFont);
-                    String time=nextTrainsC.get(i).getTime();
-                    int timeWidth=(int)Math.ceil(bigFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-                    g2d.drawString(time,128,20*(i+1)+5);
-                    g2d.setFont(baseFont);
-                    g2d.drawString(nextTrainsC.get(i).getMission(),128+timeWidth+3,20*(i+1)+2);
+                    Train trainC=nextTrainsC.get(i);
+                    if(trainC.getMission().startsWith("E"))
+                    {
+                        g2d.setFont(bigTimeFont);
+                        String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
+                        int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+                        g2d.drawString(time,128,currentY+20);
+                        if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
+                        {
+                            g2d.drawLine(127,currentY+20-11,127+timeWidth+2,currentY+20-11);
+                            g2d.drawLine(127,currentY+20-10,127+timeWidth+2,currentY+20-10);
+                            g2d.drawLine(127,currentY+20-9,127+timeWidth+2,currentY+20-9);
+                        }
+                        g2d.setFont(missionFont);
+                        g2d.drawString(trainC.getMission(),128+timeWidth+3,currentY+20-3);
+                        currentY+=20;
+                    }
+                    else
+                    {
+                        g2d.setFont(mediumTimeFont);
+                        String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
+                        int timeWidth=(int)Math.ceil(mediumTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+                        g2d.drawString(time,128,currentY+14);
+                        if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
+                        {
+                            g2d.drawLine(127,currentY+14-6,127+timeWidth+2,currentY+14-6);
+                            g2d.drawLine(127,currentY+14-5,127+timeWidth+2,currentY+14-5);
+                        }
+                        g2d.setFont(missionFont);
+                        g2d.drawString(trainC.getMission(),128+timeWidth+4,currentY+14);
+                        currentY+=14;
+                    }
                 }
-                g2d.setFont(ipFont);
+                g2d.setFont(infoFont);
                 String ip="";
                 mainLoop:for(NetworkInterface networkInterface:Collections.list(NetworkInterface.getNetworkInterfaces()))
                     for(InetAddress inetAddress:Collections.list(networkInterface.getInetAddresses()))
@@ -148,10 +174,16 @@ public class NextTrainPage extends AbstractPage
                         }
                 if(!ip.isEmpty())
                     ip=ip.substring(ip.lastIndexOf(".")+1);
-                int ipWidth=(int)Math.ceil(ipFont.getStringBounds(ip,g2d.getFontRenderContext()).getWidth());
-                g2d.fillRect(250-ipWidth-2,128-8,ipWidth+3,10);
+                int ipWidth=(int)Math.ceil(infoFont.getStringBounds(ip,g2d.getFontRenderContext()).getWidth());
+                g2d.fillRect(250-ipWidth-2,128-11,ipWidth+3,13);
                 g2d.setColor(Color.WHITE);
                 g2d.drawString(ip,250-ipWidth-1,128-1);
+                g2d.setColor(Color.BLACK);
+                String time=DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date());
+                int timeWidth=(int)Math.ceil(infoFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+                g2d.fillRect(123-timeWidth-2,128-11,timeWidth+3,13);
+                g2d.setColor(Color.WHITE);
+                g2d.drawString(time,123-timeWidth-1,128-1);
                 g2d.dispose();
 //                try(OutputStream outputStream=new FileOutputStream(new File("next_train.png")))
 //                {
