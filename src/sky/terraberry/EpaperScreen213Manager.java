@@ -117,6 +117,7 @@ public class EpaperScreen213Manager
                     {
                         reset=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_00,PinState.HIGH);
                         Logger.LOGGER.info("GPIO pin 0 opened");
+                        break;
                     }
                     catch(RuntimeException e)
                     {
@@ -141,6 +142,7 @@ public class EpaperScreen213Manager
                     {
                         dc=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);
                         Logger.LOGGER.info("GPIO pin 6 opened");
+                        break;
                     }
                     catch(RuntimeException e)
                     {
@@ -166,6 +168,7 @@ public class EpaperScreen213Manager
                     {
                         busy=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_05);
                         Logger.LOGGER.info("GPIO pin 5 opened");
+                        break;
                     }
                     catch(RuntimeException e)
                     {
