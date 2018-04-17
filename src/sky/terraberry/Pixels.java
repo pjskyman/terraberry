@@ -9,9 +9,9 @@ public class Pixels
 
     public Pixels()
     {
-        pixels=new Pixel[EpaperScreenManager.getEpaperScreenSize().getLittleWidth()][EpaperScreenManager.getEpaperScreenSize().getBigHeight()];
-        for(int j=0;j<EpaperScreenManager.getEpaperScreenSize().getLittleWidth();j++)
-            for(int i=0;i<EpaperScreenManager.getEpaperScreenSize().getBigHeight();i++)
+        pixels=new Pixel[EpaperScreen213Manager.LITTLE_WIDTH][EpaperScreen213Manager.BIG_HEIGHT];
+        for(int j=0;j<EpaperScreen213Manager.LITTLE_WIDTH;j++)
+            for(int i=0;i<EpaperScreen213Manager.BIG_HEIGHT;i++)
                 pixels[j][i]=Pixel.WHITE;
     }
 
@@ -21,15 +21,15 @@ public class Pixels
         WritableRaster sourceRaster=image.getRaster();
         for(int x=0;x<image.getWidth();x++)
             for(int y=0;y<image.getHeight();y++)
-                pixels[EpaperScreenManager.getEpaperScreenSize().getLittleWidth()-1-y][x]=(sourcePixel=sourceRaster.getPixel(x,y,sourcePixel))[1]==128?Pixel.TRANSPARENT:sourcePixel[1]>0?Pixel.WHITE:Pixel.BLACK;
+                pixels[EpaperScreen213Manager.LITTLE_WIDTH-1-y][x]=(sourcePixel=sourceRaster.getPixel(x,y,sourcePixel))[1]==128?Pixel.TRANSPARENT:sourcePixel[1]>0?Pixel.WHITE:Pixel.BLACK;
         return this;
     }
 
     public Pixels incrustTransparentImage(Pixels image)
     {
         Pixels newPixels=new Pixels();
-        for(int j=0;j<EpaperScreenManager.getEpaperScreenSize().getLittleWidth();j++)
-            for(int i=0;i<EpaperScreenManager.getEpaperScreenSize().getBigHeight();i++)
+        for(int j=0;j<EpaperScreen213Manager.LITTLE_WIDTH;j++)
+            for(int i=0;i<EpaperScreen213Manager.BIG_HEIGHT;i++)
                 if(image.pixels[j][i]!=Pixel.TRANSPARENT)
                     newPixels.pixels[j][i]=image.pixels[j][i];
                 else

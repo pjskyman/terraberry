@@ -11,13 +11,80 @@ import com.pi4j.io.spi.SpiFactory;
 import com.pi4j.io.spi.SpiMode;
 import java.io.IOException;
 
-public class EpaperScreenManager
+public class EpaperScreen213Manager
 {
     private static final SpiDevice DEVICE;
     private static final GpioPinDigitalOutput RESET;
     private static final GpioPinDigitalOutput DC;
     private static final GpioPinDigitalInput BUSY;
-    private static EpaperScreenSize epaperScreenSize;
+    public static final int LITTLE_WIDTH=128;//122 en réel mais 128 en logique
+    public static final int BIG_HEIGHT=250;
+    private static final byte[] TOTAL_REFRESH_LOOK_UP_TABLE=new byte[]
+    {
+        (byte)0x22,
+        (byte)0x55,
+        (byte)0xAA,
+        (byte)0x55,
+        (byte)0xAA,
+        (byte)0x55,
+        (byte)0xAA,
+        (byte)0x11,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x1E,
+        (byte)0x01,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00
+    };
+    private static final byte[] PARTIAL_REFRESH_LOOK_UP_TABLE=new byte[]
+    {
+        (byte)0x18,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x0F,
+        (byte)0x01,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00,
+        (byte)0x00
+    };
 
     static
     {
@@ -42,10 +109,79 @@ public class EpaperScreenManager
             }
             DEVICE=device;
             Logger.LOGGER.info("SPI device successfully initialized");
-            RESET=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_00,PinState.HIGH);
-            DC=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);
+            GpioPinDigitalOutput reset=null;
+            try
+            {
+                for(int i=0;i<10;i++)
+                    try
+                    {
+                        reset=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_00,PinState.HIGH);
+                        Logger.LOGGER.info("GPIO pin 0 opened");
+                    }
+                    catch(RuntimeException e)
+                    {
+                        Logger.LOGGER.warn("Unable to open the GPIO pin 0");
+                        Thread.sleep(Time.get(200).millisecond());
+                    }
+            }
+            catch(InterruptedException e)
+            {
+            }
+            if(reset==null)
+            {
+                Logger.LOGGER.error("Unable to open the GPIO pin 0 after 10 attempts");
+                System.exit(1);
+            }
+            RESET=reset;
+            GpioPinDigitalOutput dc=null;
+            try
+            {
+                for(int i=0;i<10;i++)
+                    try
+                    {
+                        dc=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);
+                        Logger.LOGGER.info("GPIO pin 6 opened");
+                    }
+                    catch(RuntimeException e)
+                    {
+                        Logger.LOGGER.warn("Unable to open the GPIO pin 6");
+                        Thread.sleep(Time.get(200).millisecond());
+                    }
+            }
+            catch(InterruptedException e)
+            {
+            }
+            if(dc==null)
+            {
+                Logger.LOGGER.error("Unable to open the GPIO pin 6 after 10 attempts");
+                System.exit(1);
+            }
+            DC=dc;
             DC.setShutdownOptions(Boolean.TRUE,PinState.LOW);
-            BUSY=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_05);
+            GpioPinDigitalInput busy=null;
+            try
+            {
+                for(int i=0;i<10;i++)
+                    try
+                    {
+                        busy=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_05);
+                        Logger.LOGGER.info("GPIO pin 5 opened");
+                    }
+                    catch(RuntimeException e)
+                    {
+                        Logger.LOGGER.warn("Unable to open the GPIO pin 5");
+                        Thread.sleep(Time.get(200).millisecond());
+                    }
+            }
+            catch(InterruptedException e)
+            {
+            }
+            if(busy==null)
+            {
+                Logger.LOGGER.error("Unable to open the GPIO pin 5 after 10 attempts");
+                System.exit(1);
+            }
+            BUSY=busy;
 //            BUSY.addListener(new GpioPinListenerDigital()
 //            {
 //                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
@@ -55,21 +191,10 @@ public class EpaperScreenManager
 //            });
             Logger.LOGGER.info("GPIO pins successfully initialized");
         }
-        epaperScreenSize=EpaperScreenSize._2_9;
     }
 
-    private EpaperScreenManager()
+    private EpaperScreen213Manager()
     {
-    }
-
-    public static EpaperScreenSize getEpaperScreenSize()
-    {
-        return epaperScreenSize;
-    }
-
-    public static void setEpaperScreenSize(EpaperScreenSize epaperScreenSize)
-    {
-        EpaperScreenManager.epaperScreenSize=epaperScreenSize;
     }
 
     public static synchronized void displayPage(Pixels pixels,boolean partialMode,boolean fastMode)
@@ -83,7 +208,7 @@ public class EpaperScreenManager
             DC.low();
             DEVICE.write((byte)0x01);//DRIVER_OUTPUT_CONTROL
             DC.high();
-            DEVICE.write((byte)((epaperScreenSize.getBigHeight()-1)&0xFF),(byte)(((epaperScreenSize.getBigHeight()-1)>>8)&0xFF),(byte)0x00);
+            DEVICE.write((byte)((BIG_HEIGHT-1)&0xFF),(byte)(((BIG_HEIGHT-1)>>8)&0xFF),(byte)0x00);
             DC.low();
             DEVICE.write((byte)0x0C);//BOOSTER_SOFT_START_CONTROL
             DC.high();
@@ -107,17 +232,17 @@ public class EpaperScreenManager
             DC.low();
             DEVICE.write((byte)0x32);//WRITE_LUT_REGISTER
             DC.high();
-            DEVICE.write(partialMode?epaperScreenSize.getPartialRefreshLookUpTable():epaperScreenSize.getTotalRefreshLookUpTable());
+            DEVICE.write(partialMode?PARTIAL_REFRESH_LOOK_UP_TABLE:TOTAL_REFRESH_LOOK_UP_TABLE);
             DC.low();
             DEVICE.write((byte)0x44);//SET_RAM_X_ADDRESS_START_END_POSITION
             DC.high();
-            DEVICE.write((byte)0x00,(byte)(((epaperScreenSize.getLittleWidth()-1)>>3)&0xFF));
+            DEVICE.write((byte)0x00,(byte)(((LITTLE_WIDTH-1)>>3)&0xFF));
             DC.low();
             DEVICE.write((byte)0x45);//SET_RAM_Y_ADDRESS_START_END_POSITION
             DC.high();
-            DEVICE.write((byte)0x00,(byte)0x00,(byte)((epaperScreenSize.getBigHeight()-1)&0xFF),(byte)(((epaperScreenSize.getBigHeight()-1)>>8)&0xFF));
+            DEVICE.write((byte)0x00,(byte)0x00,(byte)((BIG_HEIGHT-1)&0xFF),(byte)(((BIG_HEIGHT-1)>>8)&0xFF));
             byte b=(byte)0x00;
-            for(int j=0;j<epaperScreenSize.getBigHeight();j++)
+            for(int j=0;j<BIG_HEIGHT;j++)
             {
                 DC.low();
                 DEVICE.write((byte)0x4E);//SET_RAM_X_ADDRESS_COUNTER
@@ -132,7 +257,7 @@ public class EpaperScreenManager
                 DC.low();
                 DEVICE.write((byte)0x24);//WRITE_RAM
                 DC.high();
-                for(int i=0;i<epaperScreenSize.getLittleWidth();i++)
+                for(int i=0;i<LITTLE_WIDTH;i++)
                 {
                     if(pixels.isIOk(i)&&pixels.getPixel(i,j).getValue()==1)
                         b|=0x80>>(i%8);

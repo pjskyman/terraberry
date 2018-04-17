@@ -35,7 +35,6 @@ public final class Terraberry
 
     public static void main(String[] args)
     {
-        EpaperScreenManager.setEpaperScreenSize(EpaperScreenSize._2_13);
         Logger.LOGGER.info("Starting "+Terraberry.class.getSimpleName()+"...");
         try
         {
@@ -44,7 +43,7 @@ public final class Terraberry
             pages.sort((o1,o2)->Integer.compare(o1.getSerial(),o2.getSerial()));//au cas où...
             Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
             long lastCompleteRefresh=System.currentTimeMillis();
-            EpaperScreenManager.displayPage(currentPixels,false,false);
+            EpaperScreen213Manager.displayPage(currentPixels,false,false);
             Logger.LOGGER.info("Display content successfully updated from page "+pages.get(0).getSerial()+" (total refresh)");
             Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is ready!");
             new Thread("pageUpdater")
@@ -92,7 +91,7 @@ public final class Terraberry
                         }
                         Pixels pixels=currentlySelectedPageCopy==-1?newPixels:newPixels.incrustTransparentImage(new IncrustGenerator(pages.get(currentlySelectedPageCopy)).generateIncrust());
                         boolean fastMode=false;
-                        EpaperScreenManager.displayPage(pixels,partialRefresh,fastMode);
+                        EpaperScreen213Manager.displayPage(pixels,partialRefresh,fastMode);
                         Logger.LOGGER.info("Display content successfully updated from page "+pages.get(currentPageCopy).getSerial()+" ("+(partialRefresh?"partial":"total")+" refresh)");
                         currentPixels=newPixels;
                         lastDrawnIncrust=currentlySelectedPageCopy;
