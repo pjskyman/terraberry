@@ -71,7 +71,7 @@ public final class Logger
             for(File logFile:logFiles)
             {
                 long modified=logFile.lastModified();
-                if(modified!=0L&&now-modified>Time.get(30).day())
+                if(modified!=0L&&now-modified>Duration.of(30).day())
                 {
                     logFile.delete();
                     count++;

@@ -122,7 +122,7 @@ public class EpaperScreen213Manager
                     catch(RuntimeException e)
                     {
                         Logger.LOGGER.warn("Unable to open the GPIO pin 0");
-                        Thread.sleep(Time.get(200).millisecond());
+                        Thread.sleep(Duration.of(200).millisecond());
                     }
             }
             catch(InterruptedException e)
@@ -147,7 +147,7 @@ public class EpaperScreen213Manager
                     catch(RuntimeException e)
                     {
                         Logger.LOGGER.warn("Unable to open the GPIO pin 6");
-                        Thread.sleep(Time.get(200).millisecond());
+                        Thread.sleep(Duration.of(200).millisecond());
                     }
             }
             catch(InterruptedException e)
@@ -173,7 +173,7 @@ public class EpaperScreen213Manager
                     catch(RuntimeException e)
                     {
                         Logger.LOGGER.warn("Unable to open the GPIO pin 5");
-                        Thread.sleep(Time.get(200).millisecond());
+                        Thread.sleep(Duration.of(200).millisecond());
                     }
             }
             catch(InterruptedException e)
@@ -205,9 +205,9 @@ public class EpaperScreen213Manager
         try
         {
             RESET.low();
-            Thread.sleep(Time.get(150).millisecond());
+            Thread.sleep(Duration.of(150).millisecond());
             RESET.high();
-            Thread.sleep(Time.get(150).millisecond());
+            Thread.sleep(Duration.of(150).millisecond());
             DC.low();
             DEVICE.write((byte)0x01);//DRIVER_OUTPUT_CONTROL
             DC.high();
@@ -256,7 +256,7 @@ public class EpaperScreen213Manager
                 DC.high();
                 DEVICE.write((byte)(j&0xFF),(byte)((j>>8)&0xFF));
                 while(BUSY.isHigh())
-                    Thread.sleep(Time.get(10).millisecond());
+                    Thread.sleep(Duration.of(10).millisecond());
                 DC.low();
                 DEVICE.write((byte)0x24);//WRITE_RAM
                 DC.high();
@@ -279,7 +279,7 @@ public class EpaperScreen213Manager
             DEVICE.write((byte)0x20);//MASTER_ACTIVATION
             DEVICE.write((byte)0xFF);//TERMINATE_FRAME_READ_WRITE
             while(BUSY.isHigh())
-                Thread.sleep(Time.get(10).millisecond());
+                Thread.sleep(Duration.of(10).millisecond());
         }
         catch(InterruptedException e)
         {

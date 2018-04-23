@@ -53,7 +53,7 @@ public final class Terraberry
                 {
                     try
                     {
-                        Thread.sleep(Time.get(1).second());
+                        Thread.sleep(Duration.of(1).second());
                         while(true)
                         {
                             try
@@ -64,7 +64,7 @@ public final class Terraberry
                             {
                                 Logger.LOGGER.error("Unmanaged throwable during refresh ("+t.toString()+")");
                             }
-                            Thread.sleep(Time.get(100).millisecond());
+                            Thread.sleep(Duration.of(100).millisecond());
                         }
                     }
                     catch(InterruptedException e)
@@ -84,7 +84,7 @@ public final class Terraberry
                     {
                         long now=System.currentTimeMillis();
                         boolean partialRefresh=true;
-                        if(currentlySelectedPageCopy==-1&&now-lastCompleteRefresh>Time.get(30).minute())
+                        if(currentlySelectedPageCopy==-1&&now-lastCompleteRefresh>Duration.of(30).minute())
                         {
                             partialRefresh=false;
                             lastCompleteRefresh=now;
@@ -96,7 +96,7 @@ public final class Terraberry
                         currentPixels=newPixels;
                         lastDrawnIncrust=currentlySelectedPageCopy;
                     }
-                    Thread.sleep(Time.get(50).millisecond());
+                    Thread.sleep(Duration.of(50).millisecond());
                 }
             }
             catch(InterruptedException e)
