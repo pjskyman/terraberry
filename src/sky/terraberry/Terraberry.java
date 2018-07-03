@@ -39,7 +39,7 @@ public final class Terraberry
         try
         {
             List<Page> pages=new ArrayList<>();
-            pages.add(new NextTrainPage().potentiallyUpdate());
+            pages.add(new NextTrainAndWeatherPage().potentiallyUpdate());
             pages.sort((o1,o2)->Integer.compare(o1.getSerial(),o2.getSerial()));//au cas où...
             Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
             long lastCompleteRefresh=System.currentTimeMillis();
@@ -84,7 +84,7 @@ public final class Terraberry
                     {
                         long now=System.currentTimeMillis();
                         boolean partialRefresh=true;
-                        if(currentlySelectedPageCopy==-1&&now-lastCompleteRefresh>Duration.of(30).minute())
+                        if(currentlySelectedPageCopy==-1&&now-lastCompleteRefresh>Duration.of(10).minute())
                         {
                             partialRefresh=false;
                             lastCompleteRefresh=now;

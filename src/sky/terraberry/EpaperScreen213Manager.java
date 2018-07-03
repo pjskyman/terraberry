@@ -219,7 +219,7 @@ public class EpaperScreen213Manager
             DC.low();
             DEVICE.write((byte)0x2C);//WRITE_VCOM_REGISTER
             DC.high();
-            DEVICE.write((byte)0xA8);
+            DEVICE.write((byte)0x60);
             DC.low();
             DEVICE.write((byte)0x3A);//SET_DUMMY_LINE_PERIOD
             DC.high();
