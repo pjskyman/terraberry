@@ -309,7 +309,7 @@ public class NextTrainAndWeatherPage extends AbstractPage
                     String humidity=new DecimalFormat("###0").format(currently.getHumidity()*100d)+"%";
                     g2d.drawString(humidity,148,20);
 
-                    String precipIntensity=new DecimalFormat("###0.0").format(currently.getPrecipIntensity())+"mm";
+                    String precipIntensity=new DecimalFormat("###0.0").format(currently.getPrecipIntensity())+"mm/h";
                     g2d.drawString(precipIntensity,192,20);
                 }
 
