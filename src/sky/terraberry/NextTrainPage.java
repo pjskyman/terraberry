@@ -7,18 +7,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import javax.imageio.ImageIO;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -28,7 +25,7 @@ public class NextTrainPage extends AbstractPage
     private long lastRefreshTime;
     private final List<Train> nextTrainsR;
     private final List<Train> nextTrainsC;
-    private static final boolean INTERNET_ACTIVE=false;
+    private static final boolean INTERNET_ACTIVE=true;
 
     public NextTrainPage()
     {
@@ -189,10 +186,10 @@ public class NextTrainPage extends AbstractPage
                 }
 
                 g2d.dispose();
-                try(OutputStream outputStream=new FileOutputStream(new File("next_train.png")))
-                {
-                    ImageIO.write(sourceImage,"png",outputStream);
-                }
+//                try(OutputStream outputStream=new FileOutputStream(new File("next_train.png")))
+//                {
+//                    ImageIO.write(sourceImage,"png",outputStream);
+//                }
                 pixels=new Pixels().writeImage(sourceImage);
                 Logger.LOGGER.info("Page "+getSerial()+" updated successfully");
             }

@@ -73,6 +73,25 @@ public final class Terraberry
                     }
                 }
             }.start();
+            new Thread("pageSelector")
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(Duration.of(15).second());
+                        while(true)
+                        {
+                            currentPage=(currentPage+1)%2;
+                            Thread.sleep(Duration.of(10).second());
+                        }
+                    }
+                    catch(InterruptedException e)
+                    {
+                    }
+                }
+            }.start();
             try
             {
                 int lastDrawnIncrust=currentlySelectedPage;

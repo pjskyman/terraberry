@@ -11,11 +11,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -24,14 +22,13 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Date;
-import javax.imageio.ImageIO;
 
 public class WeatherPage extends AbstractPage
 {
     private long lastRefreshTime;
     private long lastWeatherForecastVerificationTime;
     private Currently currently;
-    private static final boolean INTERNET_ACTIVE=false;
+    private static final boolean INTERNET_ACTIVE=true;
 
     public WeatherPage()
     {
@@ -248,10 +245,10 @@ public class WeatherPage extends AbstractPage
                 }
 
                 g2d.dispose();
-                try(OutputStream outputStream=new FileOutputStream(new File("weather.png")))
-                {
-                    ImageIO.write(sourceImage,"png",outputStream);
-                }
+//                try(OutputStream outputStream=new FileOutputStream(new File("weather.png")))
+//                {
+//                    ImageIO.write(sourceImage,"png",outputStream);
+//                }
                 pixels=new Pixels().writeImage(sourceImage);
                 Logger.LOGGER.info("Page "+getSerial()+" updated successfully");
             }
