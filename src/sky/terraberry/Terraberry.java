@@ -39,7 +39,8 @@ public final class Terraberry
         try
         {
             List<Page> pages=new ArrayList<>();
-            pages.add(new NextTrainAndWeatherPage().potentiallyUpdate());
+            pages.add(new NextTrainPage().potentiallyUpdate());
+            pages.add(new WeatherPage().potentiallyUpdate());
             pages.sort((o1,o2)->Integer.compare(o1.getSerial(),o2.getSerial()));//au cas où...
             Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
             long lastCompleteRefresh=System.currentTimeMillis();
