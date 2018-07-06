@@ -39,7 +39,8 @@ public final class Terraberry
         try
         {
             List<Page> pages=new ArrayList<>();
-            pages.add(new NextTrainAndWeatherPage().potentiallyUpdate());
+            pages.add(new NextTrainPage().potentiallyUpdate());
+            pages.add(new WeatherPage().potentiallyUpdate());
             pages.sort((o1,o2)->Integer.compare(o1.getSerial(),o2.getSerial()));//au cas où...
             Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
             long lastCompleteRefresh=System.currentTimeMillis();
@@ -65,6 +66,25 @@ public final class Terraberry
                                 Logger.LOGGER.error("Unmanaged throwable during refresh ("+t.toString()+")");
                             }
                             Thread.sleep(Duration.of(100).millisecond());
+                        }
+                    }
+                    catch(InterruptedException e)
+                    {
+                    }
+                }
+            }.start();
+            new Thread("pageSelector")
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(Duration.of(15).second());
+                        while(true)
+                        {
+                            currentPage=(currentPage+1)%2;
+                            Thread.sleep(Duration.of(10).second());
                         }
                     }
                     catch(InterruptedException e)
