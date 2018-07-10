@@ -248,13 +248,24 @@ public class WeatherPage extends AbstractPage
 
                     g2d.setStroke(new BasicStroke(2.5f));
                     g2d.drawLine(
-                            windStringWidth+12+(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*8d),98-(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*8d),
-                            windStringWidth+12-(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*6d),98+(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*6d)
+                            windStringWidth+12+(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*8d),
+                            98-(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*8d),
+                            windStringWidth+12-(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*6d),
+                            98+(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*6d)
                     );
                     Path2D path=new Path2D.Double();
-                    path.moveTo((double)windStringWidth+12d-Math.sin((double)currently.getWindBearing()*Math.PI/180d)*10d,98d+Math.cos((double)currently.getWindBearing()*Math.PI/180d)*10d);
-                    path.lineTo((double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d,98d+Math.cos((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d);
-                    path.lineTo((double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d,98d+Math.cos((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d);
+                    path.moveTo(
+                            (double)windStringWidth+12d-Math.sin((double)currently.getWindBearing()*Math.PI/180d)*10d,
+                            98d+Math.cos((double)currently.getWindBearing()*Math.PI/180d)*10d
+                    );
+                    path.lineTo(
+                            (double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d,
+                            98d+Math.cos((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d
+                    );
+                    path.lineTo(
+                            (double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d,
+                            98d+Math.cos((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d
+                    );
                     path.closePath();
                     g2d.fill(path);
 
