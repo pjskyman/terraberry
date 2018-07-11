@@ -59,7 +59,7 @@ public final class Terraberry
                         {
                             try
                             {
-                                pages.forEach(page->page.potentiallyUpdate());
+                                pages.forEach(Page::potentiallyUpdate);
                             }
                             catch(Throwable t)
                             {
