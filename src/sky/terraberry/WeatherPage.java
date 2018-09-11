@@ -53,7 +53,7 @@ public class WeatherPage extends AbstractPage
     public synchronized Page potentiallyUpdate()
     {
         long now=System.currentTimeMillis();
-        if(now-lastRefreshTime>Duration.of(1).minutePlus(3).secondPlus(700).millisecond())
+        if(now-lastRefreshTime>Duration.of(10).secondPlus(291).millisecond())
         {
             lastRefreshTime=now;
             try
@@ -145,7 +145,7 @@ public class WeatherPage extends AbstractPage
 
                 Font infoFont=Terraberry.FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.9d,1d));
                 Font slightlyCondensedInfoFont=Terraberry.FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.8d,1d));
-                Font heavilyCondensedInfoFont=Terraberry.FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.6d,1d));
+                Font heavilyCondensedInfoFont=Terraberry.FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.8d,1d));//on essaye avec .8d aussi
 
                 g2d.setFont(infoFont);
 
@@ -176,19 +176,29 @@ public class WeatherPage extends AbstractPage
                 {
                 }
 
-                String processorTemperature;
-                if(systemInfoProvider!=null)
-                    try
-                    {
-                        processorTemperature=new DecimalFormat("###0.0").format((double)systemInfoProvider.getCpuTemperature());
-                    }
-                    catch(Exception e)
-                    {
-                        processorTemperature="?";
-                    }
-                else
-                    processorTemperature="53,7";
-                processorTemperature+="°C";
+//                String processorTemperature;
+//                if(systemInfoProvider!=null)
+//                    try
+//                    {
+//                        processorTemperature=new DecimalFormat("###0.0").format((double)systemInfoProvider.getCpuTemperature());
+//                    }
+//                    catch(Exception e)
+//                    {
+//                        processorTemperature="?";
+//                    }
+//                else
+//                    processorTemperature="53,7";
+//                processorTemperature+="°C";
+                String deskTemperature;
+                try
+                {
+                    deskTemperature=new DecimalFormat("###0.0").format(ThermometerManager.getTemperature());
+                }
+                catch(Exception e)
+                {
+                    deskTemperature="?";
+                }
+                deskTemperature+="°C";
 
                 String freeMemory;
                 if(systemInfoProvider!=null)
@@ -203,7 +213,7 @@ public class WeatherPage extends AbstractPage
                 else
                     freeMemory="289";
                 freeMemory+="Mo";
-                g2d.drawString(time+"  "+ip+"  Pi:"+processorTemperature+"  "+freeMemory,0,20);
+                g2d.drawString(time+"  "+ip+"  Ici:"+deskTemperature+"  "+freeMemory,0,20);
 
                 if(currently!=null)
                 {

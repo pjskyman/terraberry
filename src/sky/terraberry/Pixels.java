@@ -9,10 +9,20 @@ public class Pixels
 
     public Pixels()
     {
+        this(Pixel.WHITE);
+    }
+
+    public Pixels(Pixel defaultPixel)
+    {
+        this((i,j)->defaultPixel);
+    }
+
+    public Pixels(PixelGenerator pixelGenerator)
+    {
         pixels=new Pixel[EpaperScreen213Manager.LITTLE_WIDTH][EpaperScreen213Manager.BIG_HEIGHT];
         for(int j=0;j<EpaperScreen213Manager.LITTLE_WIDTH;j++)
             for(int i=0;i<EpaperScreen213Manager.BIG_HEIGHT;i++)
-                pixels[j][i]=Pixel.WHITE;
+                pixels[j][i]=pixelGenerator.getPixel(i,j);
     }
 
     public Pixels writeImage(BufferedImage image)
@@ -40,6 +50,11 @@ public class Pixels
     public Pixel getPixel(int i,int j)
     {
         return pixels[i][j];
+    }
+
+    public void setPixel(int i,int j,Pixel pixel)
+    {
+        pixels[i][j]=pixel;
     }
 
     public boolean isIOk(int i)
