@@ -200,6 +200,14 @@ public class EpaperScreen213Manager
     {
     }
 
+    /**
+     * Envoie à l'écran Waveshare le contenu de la matrice de pixels spécifiée.
+     * Le premier booléen spécifié permet d'indiquer si on souhaite effectuer
+     * un total refresh ou non au préalable, et le second permet juste de
+     * réactualiser le contenu de l'écran sans réinitialiser totalement le
+     * contrôleur. Attention, le second booléen n'est pas encore opérationnel
+     * et n'est donc pas pris en compte.
+     */
     public static synchronized void displayPage(Pixels pixels,boolean partialMode,boolean fastMode)
     {
         try

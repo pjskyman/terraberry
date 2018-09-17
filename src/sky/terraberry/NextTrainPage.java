@@ -112,18 +112,18 @@ public class NextTrainPage extends AbstractPage
                 g2d.setColor(Color.WHITE);
                 g2d.fillRect(0,6,250,122);
                 g2d.setColor(Color.BLACK);
-                g2d.drawLine(123,6,123,128);
-                g2d.drawLine(124,6,124,128);
-                g2d.drawLine(125,6,125,128);
-                g2d.drawLine(126,6,126,128);
+//                g2d.drawLine(123,6,123,128);
+//                g2d.drawLine(124,6,124,128);
+//                g2d.drawLine(125,6,125,128);
+//                g2d.drawLine(126,6,126,128);
 
                 if(errorC)
-                    for(int x=0;x<123;x++)
+                    for(int x=0;x<122;x++)
                         for(int y=0;y<128;y++)
                             if((x+(y-1)/2)%2==0)
                                 g2d.drawLine(x,y,x,y);
                 if(errorR)
-                    for(int x=127;x<250;x++)
+                    for(int x=122;x<250;x++)
                         for(int y=0;y<128;y++)
                             if((x+(y-1)/2)%2==0)
                                 g2d.drawLine(x,y,x,y);
@@ -174,15 +174,15 @@ public class NextTrainPage extends AbstractPage
                     g2d.setFont(bigTimeFont);
                     String time=trainR.getTime()+(trainR.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
                     int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-                    g2d.drawString(time,128,20*(i+1)+5);
+                    g2d.drawString(time,123,20*(i+1)+5);
                     if(trainR.getAdditionalMessage().toLowerCase().contains("suppr"))
                     {
-                        g2d.drawLine(127,20*(i+1)+5-11,127+timeWidth+2,20*(i+1)+5-11);
-                        g2d.drawLine(127,20*(i+1)+5-10,127+timeWidth+2,20*(i+1)+5-10);
-                        g2d.drawLine(127,20*(i+1)+5-9,127+timeWidth+2,20*(i+1)+5-9);
+                        g2d.drawLine(122,20*(i+1)+5-11,122+timeWidth+2,20*(i+1)+5-11);
+                        g2d.drawLine(122,20*(i+1)+5-10,122+timeWidth+2,20*(i+1)+5-10);
+                        g2d.drawLine(122,20*(i+1)+5-9,122+timeWidth+2,20*(i+1)+5-9);
                     }
                     g2d.setFont(bigMissionFont);
-                    g2d.drawString(trainR.getMission(),128+timeWidth+3,20*(i+1)+2);
+                    g2d.drawString(trainR.getMission(),123+timeWidth+3,20*(i+1)+2);
                 }
 
                 g2d.dispose();

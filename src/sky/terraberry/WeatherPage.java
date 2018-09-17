@@ -217,8 +217,8 @@ public class WeatherPage extends AbstractPage
 
                 if(currently!=null)
                 {
-                    g2d.drawLine(0,24,250,24);
-                    g2d.drawLine(0,25,250,25);
+//                    g2d.drawLine(0,24,250,24);
+//                    g2d.drawLine(0,25,250,25);
 
                     g2d.setFont(heavilyCondensedInfoFont);
 
