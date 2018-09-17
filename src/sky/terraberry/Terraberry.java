@@ -14,7 +14,6 @@ import java.util.List;
 public final class Terraberry
 {
     private static int currentPage=0;
-    private static int currentlySelectedPage=-1;
     public static final Font FONT;
 
     static
@@ -113,10 +112,10 @@ public final class Terraberry
                 {
                     try
                     {
-                        Thread.sleep(Duration.of(15).second());
+                        Thread.sleep(Duration.of(10).second());
                         while(true)
                         {
-                            currentPage=(currentPage+1)%2;
+                            currentPage=(currentPage+1)%pages.size();
                             Thread.sleep(Duration.of(10).second());
                         }
                     }
@@ -127,30 +126,29 @@ public final class Terraberry
             }.start();
             try
             {
-                int lastDrawnIncrust=currentlySelectedPage;
                 while(true)
                 {
                     int currentPageCopy=currentPage;
-                    int currentlySelectedPageCopy=currentlySelectedPage;
                     Pixels newPixels=pages.get(currentPageCopy).getPixels();
-                    if(newPixels!=currentPixels||currentlySelectedPageCopy!=lastDrawnIncrust)
+                    if(newPixels!=currentPixels)
                     {
                         long now=System.currentTimeMillis();
-                        boolean partialRefresh=true;
-                        if(currentlySelectedPageCopy==-1&&now-lastCompleteRefresh>Duration.of(5).minute())
+                        boolean partialRefresh=true;//par défaut, on fait du partiel
+                        if(now-lastCompleteRefresh>Duration.of(5).minute())//mais régulièrement, on fait un total refresh quand même
                         {
                             partialRefresh=false;
                             lastCompleteRefresh=now;
                         }
-                        Pixels pixels=currentlySelectedPageCopy==-1?newPixels:newPixels.incrustTransparentImage(new IncrustGenerator(pages.get(currentlySelectedPageCopy)).generateIncrust());
-                        boolean fastMode=false;
+                        boolean fastMode=false;//pas encore fonctionnel
                         if(!partialRefresh)
+                        {
                             totalRefresh();
+                            EpaperScreen213Manager.displayPage(newPixels,true,fastMode);
+                        }
                         else
-                            EpaperScreen213Manager.displayPage(pixels,partialRefresh,fastMode);
+                            EpaperScreen213Manager.displayPage(newPixels,partialRefresh,fastMode);
                         Logger.LOGGER.info("Display content successfully updated from page "+pages.get(currentPageCopy).getSerial()+" ("+(partialRefresh?"partial":"total")+" refresh)");
                         currentPixels=newPixels;
-                        lastDrawnIncrust=currentlySelectedPageCopy;
                     }
                     Thread.sleep(Duration.of(50).millisecond());
                 }
