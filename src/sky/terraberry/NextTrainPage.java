@@ -206,7 +206,7 @@ public class NextTrainPage extends AbstractPage
     {
         try
         {
-            HttpURLConnection connection=(HttpURLConnection)new URL("http://api.transilien.com/gare/"+departure+"/depart/"+arrival).openConnection();
+            HttpURLConnection connection=(HttpURLConnection)new URL("https://api.transilien.com/gare/"+departure+"/depart/"+arrival).openConnection();
             connection.setRequestProperty("Authorization","Basic "+Base64.getEncoder().encodeToString((login+":"+password).getBytes()));
             connection.setRequestProperty("Accept","application/vnd.sncf.transilien.od.depart+xml;vers=1");
             connection.setConnectTimeout(5000);
