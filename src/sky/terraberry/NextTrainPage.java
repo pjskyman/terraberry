@@ -90,12 +90,14 @@ public class NextTrainPage extends AbstractPage
                 {
                     errorC=false;
                     errorR=false;
+
                     nextTrainsC.add(new Train("18:01","ELAO","Coucou","Retardé"));
                     nextTrainsC.add(new Train("18:18","ELAO","Coucou","Supprimé"));
                     nextTrainsC.add(new Train("18:31","ELAO","Coucou",""));
                     nextTrainsC.add(new Train("18:46","ZEGO","Coucou","Retardé"));
                     nextTrainsC.add(new Train("19:01","ZOBA","Coucou","Supprimé"));
                     nextTrainsC.add(new Train("19:16","ELBA","Coucou",""));
+
                     nextTrainsR.add(new Train("18:07","GAMA","Coucou",""));
                     nextTrainsR.add(new Train("18:13","LARO","Coucou",""));
                     nextTrainsR.add(new Train("18:32","GAME","Coucou",""));
@@ -133,40 +135,31 @@ public class NextTrainPage extends AbstractPage
                 Font bigMissionFont=Terraberry.FONT.deriveFont(20f).deriveFont(AffineTransform.getScaleInstance(.85d,1d));
                 Font mediumMissionFont=Terraberry.FONT.deriveFont(13f).deriveFont(AffineTransform.getScaleInstance(1.1d,.95d));
                 int currentY=5;
+                if(nextTrainsC.stream().anyMatch(train->train.getMission().startsWith("E")))
+                {
+                    List<Train> list=new ArrayList<Train>();
+                    nextTrainsC.stream()
+                            .filter(train->train.getMission().startsWith("E"))
+                            .forEach(list::add);
+                    nextTrainsC.clear();
+                    nextTrainsC.addAll(list);
+                }
                 for(int i=0;i<nextTrainsC.size();i++)
                 {
                     Train trainC=nextTrainsC.get(i);
-                    if(trainC.getMission().startsWith("E"))
+                    g2d.setFont(bigTimeFont);
+                    String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
+                    int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+                    g2d.drawString(time,1,currentY+20);
+                    if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
                     {
-                        g2d.setFont(bigTimeFont);
-                        String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
-                        int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-                        g2d.drawString(time,1,currentY+20);
-                        if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
-                        {
-                            g2d.drawLine(0,currentY+20-11,timeWidth+2,currentY+20-11);
-                            g2d.drawLine(0,currentY+20-10,timeWidth+2,currentY+20-10);
-                            g2d.drawLine(0,currentY+20-9,timeWidth+2,currentY+20-9);
-                        }
-                        g2d.setFont(bigMissionFont);
-                        g2d.drawString(trainC.getMission(),1+timeWidth+3,currentY+20-3);
-                        currentY+=20;
+                        g2d.drawLine(0,currentY+20-11,timeWidth+2,currentY+20-11);
+                        g2d.drawLine(0,currentY+20-10,timeWidth+2,currentY+20-10);
+                        g2d.drawLine(0,currentY+20-9,timeWidth+2,currentY+20-9);
                     }
-                    else
-                    {
-                        g2d.setFont(mediumTimeFont);
-                        String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
-                        int timeWidth=(int)Math.ceil(mediumTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-                        g2d.drawString(time,1,currentY+9);
-                        if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
-                        {
-                            g2d.drawLine(0,currentY+9-4,timeWidth+2,currentY+9-4);
-                            g2d.drawLine(0,currentY+9-3,timeWidth+2,currentY+9-3);
-                        }
-                        g2d.setFont(mediumMissionFont);
-                        g2d.drawString(trainC.getMission(),1+timeWidth+4,currentY+9);
-                        currentY+=9;
-                    }
+                    g2d.setFont(bigMissionFont);
+                    g2d.drawString(trainC.getMission(),1+timeWidth+3,currentY+20-3);
+                    currentY+=20;
                 }
                 for(int i=0;i<nextTrainsR.size();i++)
                 {
