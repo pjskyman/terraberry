@@ -1,36 +1,11 @@
 package sky.terraberry;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import sky.program.Duration;
+import sky.terraberry.page.MainMenuPage;
 
 public final class Terraberry
 {
-    private static int currentPage=0;
-    public static final Font FONT;
-
-    static
-    {
-        Font font=null;
-        try(FileInputStream inputStream=new FileInputStream(new File("Baloo-Regular.ttf")))
-        {
-            font=Font.createFont(Font.TRUETYPE_FONT,inputStream);
-            Logger.LOGGER.info("Font loaded successfully");
-        }
-        catch(IOException|FontFormatException e)
-        {
-            Logger.LOGGER.error("Unable to load the font ("+e.toString()+")");
-        }
-        FONT=font;
-    }
-
     private Terraberry()
     {
     }
@@ -40,11 +15,12 @@ public final class Terraberry
         Logger.LOGGER.info("Starting "+Terraberry.class.getSimpleName()+"...");
         try
         {
-            List<Page> pages=new ArrayList<>();
-            pages.add(new NextTrainPage().potentiallyUpdate());
-            pages.add(new WeatherPage().potentiallyUpdate());
-            Pixels currentPixels=pages.get(0).potentiallyUpdate().getPixels();
+            MainMenuPage mainMenuPage=new MainMenuPage();
+            Screen currentScreen=mainMenuPage.potentiallyUpdate().getScreen();
+            AtomicInteger currentModificationCount=new AtomicInteger(currentScreen.getModificationCount());
             long lastCompleteRefresh=System.currentTimeMillis();
+            EpaperScreenManager.display(currentScreen,RefreshType.TOTAL_REFRESH);
+            Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is now ready!");
             new Thread("ledUpdater")
             {
                 @Override
@@ -75,10 +51,6 @@ public final class Terraberry
                     }
                 }
             }.start();
-            totalRefresh();
-            EpaperScreen213Manager.displayPage(currentPixels,true,false);
-            Logger.LOGGER.info("Display content successfully updated from page "+pages.get(0).getSerial()+" (total refresh)");
-            Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is ready!");
             new Thread("pageUpdater")
             {
                 @Override
@@ -91,13 +63,14 @@ public final class Terraberry
                         {
                             try
                             {
-                                pages.forEach(Page::potentiallyUpdate);
+                                mainMenuPage.potentiallyUpdate();
                             }
                             catch(Throwable t)
                             {
-                                Logger.LOGGER.error("Unmanaged throwable during refresh ("+t.toString()+")");
+                                Logger.LOGGER.error("Unmanaged error during refresh ("+t.toString()+")");
+                                t.printStackTrace();
                             }
-                            Thread.sleep(Duration.of(100).millisecond());
+                            Thread.sleep(Duration.of(207).millisecond());
                         }
                     }
                     catch(InterruptedException e)
@@ -115,7 +88,8 @@ public final class Terraberry
                         Thread.sleep(Duration.of(10).second());
                         while(true)
                         {
-                            currentPage=(currentPage+1)%pages.size();
+                            mainMenuPage.rotated(RotationDirection.CLOCKWISE);
+                            mainMenuPage.clicked(false);
                             Thread.sleep(Duration.of(10).second());
                         }
                     }
@@ -128,29 +102,26 @@ public final class Terraberry
             {
                 while(true)
                 {
-                    int currentPageCopy=currentPage;
-                    Pixels newPixels=pages.get(currentPageCopy).getPixels();
-                    if(newPixels!=currentPixels)
+//                    Logger.LOGGER.info("Getting new pixels from page \""+mainMenuPage.getActivePageName()+"\"");
+                    Screen newScreen=mainMenuPage.getScreen();
+                    int newModificationCount=newScreen.getModificationCount();
+//                    Logger.LOGGER.info("New pixels successfully got from page \""+mainMenuPage.getActivePageName()+"\"");
+                    if(newScreen!=currentScreen||newModificationCount!=currentModificationCount.get())
                     {
                         long now=System.currentTimeMillis();
-                        boolean partialRefresh=true;//par défaut, on fait du partiel
-                        if(now-lastCompleteRefresh>Duration.of(5).minute())//mais régulièrement, on fait un total refresh quand même
+                        RefreshType realRefreshType=RefreshType.PARTIAL_REFRESH;
+                        if(now-lastCompleteRefresh>Duration.of(10).minute())
                         {
-                            partialRefresh=false;
+                            realRefreshType=realRefreshType.combine(RefreshType.TOTAL_REFRESH);
                             lastCompleteRefresh=now;
                         }
-                        boolean fastMode=false;//pas encore fonctionnel
-                        if(!partialRefresh)
-                        {
-                            totalRefresh();
-                            EpaperScreen213Manager.displayPage(newPixels,true,fastMode);
-                        }
-                        else
-                            EpaperScreen213Manager.displayPage(newPixels,partialRefresh,fastMode);
-                        Logger.LOGGER.info("Display content successfully updated from page "+pages.get(currentPageCopy).getSerial()+" ("+(partialRefresh?"partial":"total")+" refresh)");
-                        currentPixels=newPixels;
+                        Logger.LOGGER.info("Updating display content from page \""+mainMenuPage.getActivePageName()+"\" ("+realRefreshType.toString()+")");
+                        EpaperScreenManager.display(newScreen,realRefreshType);
+                        Logger.LOGGER.info("Display content successfully updated from page \""+mainMenuPage.getActivePageName()+"\" ("+realRefreshType.toString()+")");
+                        currentScreen=newScreen;
+                        currentModificationCount.set(newModificationCount);
                     }
-                    Thread.sleep(Duration.of(50).millisecond());
+                    Thread.sleep(Duration.of(48).millisecond());
                 }
             }
             catch(InterruptedException e)
@@ -161,46 +132,5 @@ public final class Terraberry
         {
             Logger.LOGGER.error("Unknown error ("+e.toString()+")");
         }
-    }
-
-    /**
-     * Unfortunately, our screen has a problem and can't make proper
-     * total-refresh anymore. Here is an alternative method to clear the screen
-     * quite finely. If you are discovering this code, please use the regular
-     * total-refresh with the correct boolean value passed to the method
-     * EpaperScreen213Manager.displayPage(...).
-     */
-    private static void totalRefresh()
-    {
-        int count=0;
-        for(int i=0;i<2;i++)
-        {
-            BufferedImage image=new BufferedImage(250,128,BufferedImage.TYPE_INT_ARGB_PRE);
-            Graphics2D g2d=image.createGraphics();
-            g2d.setColor(Color.WHITE);
-            g2d.fillRect(0,0,250,128);
-            g2d.setColor(Color.BLACK);
-            int currentY=count%128;
-            count+=32;
-            for(int j=0;j<32;j++)
-                g2d.drawLine(0,currentY+j,250,currentY+j);
-            g2d.dispose();
-            EpaperScreen213Manager.displayPage(new Pixels().writeImage(image),true,false);
-        }
-        for(int i=0;i<4;i++)
-        {
-            BufferedImage image=new BufferedImage(250,128,BufferedImage.TYPE_INT_ARGB_PRE);
-            Graphics2D g2d=image.createGraphics();
-            g2d.setColor(Color.WHITE);
-            g2d.fillRect(0,0,250,128);
-            g2d.setColor(Color.BLACK);
-            int currentY=count%128;
-            count+=16;
-            for(int j=0;j<16;j++)
-                g2d.drawLine(0,currentY+j,250,currentY+j);
-            g2d.dispose();
-            EpaperScreen213Manager.displayPage(new Pixels().writeImage(image),true,false);
-        }
-        EpaperScreen213Manager.displayPage(new Pixels(Pixel.WHITE),true,false);
     }
 }

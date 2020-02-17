@@ -1,4 +1,4 @@
-package sky.terraberry;
+package sky.terraberry.page;
 
 public class Train
 {

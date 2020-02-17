@@ -1,5 +1,7 @@
 package sky.terraberry;
 
+import sky.program.Duration;
+
 public class TestLed
 {
     private TestLed()

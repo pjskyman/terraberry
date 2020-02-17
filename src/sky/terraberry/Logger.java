@@ -14,6 +14,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.TTCCLayout;
 import org.apache.log4j.helpers.DateTimeDateFormat;
 import org.apache.log4j.spi.LoggingEvent;
+import sky.program.Duration;
 
 public final class Logger
 {
