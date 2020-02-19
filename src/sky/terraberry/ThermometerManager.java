@@ -63,9 +63,7 @@ public class ThermometerManager
                 temperature-=8192;
 //            Logger.LOGGER.info("Temperature is "+temperature*.0625d+"°C");
             double rawTemp=(double)temperature*.0625d;
-            return -.024681*rawTemp*rawTemp+1.950705d*rawTemp-11.131971d;//correction applied according to a referential analog thermometer
-            //Our device seems to have a problem since measured temperatures are biased by about 2.5°C.
-            //Please adapt the correction if your device works properly!
+            return rawTemp;
         }
         catch(IOException e)
         {
