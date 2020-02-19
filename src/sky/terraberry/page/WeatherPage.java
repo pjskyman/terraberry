@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.io.BufferedReader;
 import java.io.File;
@@ -122,18 +123,15 @@ public class WeatherPage extends AbstractSinglePage
             }
             catch(Exception e)
             {
-                Logger.LOGGER.error(e.toString());
+                e.printStackTrace();
             }
         }
         else
             if(!INTERNET_ACTIVE)
-                currently=new Currently(now,"Nuages épars et quelques averses","partly-cloudy-day",2.3d,.1d,28.7d,26.3d,15.2d,.64d,1032.8d,32d,45d,332,.37d,10,10d,444d);
+                currently=new Currently(now,"Nuages épars et quelques averses","partly-cloudy-day",2.3d,.1d,28.7d,26.3d,15.2d,.64d,1032.8d,32d,45d,165,.67d,10,10d,444d);
 
-        Font infoFont=BALOO_FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.9d,1d));
-        Font slightlyCondensedInfoFont=BALOO_FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.8d,1d));
-        Font heavilyCondensedInfoFont=BALOO_FONT.deriveFont(21f).deriveFont(AffineTransform.getScaleInstance(.8d,1d));//on essaye avec .8d aussi
-
-        g2d.setFont(infoFont);
+        Font bigFont=FREDOKA_ONE_FONT.deriveFont(26f).deriveFont(AffineTransform.getScaleInstance(.85,1d));
+        Font littleFont=FREDOKA_ONE_FONT.deriveFont(18f).deriveFont(AffineTransform.getScaleInstance(.8d,1d));
 
         String time=DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date());
 
@@ -152,6 +150,7 @@ public class WeatherPage extends AbstractSinglePage
         }
         else
             ip=".xxx";
+        ip="IP "+ip;
 
         SystemInfoProvider systemInfoProvider=null;
         try
@@ -161,30 +160,6 @@ public class WeatherPage extends AbstractSinglePage
         catch(Exception e)
         {
         }
-
-//        String processorTemperature;
-//        if(systemInfoProvider!=null)
-//            try
-//            {
-//                processorTemperature=new DecimalFormat("###0.0").format((double)systemInfoProvider.getCpuTemperature());
-//            }
-//            catch(Exception e)
-//            {
-//                processorTemperature="?";
-//            }
-//        else
-//            processorTemperature="53,7";
-//        processorTemperature+="°C";
-        String deskTemperature;
-        try
-        {
-            deskTemperature=new DecimalFormat("###0.0").format(ThermometerManager.getTemperature());
-        }
-        catch(Exception e)
-        {
-            deskTemperature="?";
-        }
-        deskTemperature+="°C";
 
         String freeMemory;
         if(systemInfoProvider!=null)
@@ -198,88 +173,110 @@ public class WeatherPage extends AbstractSinglePage
             }
         else
             freeMemory="289";
-        freeMemory+="Mo";
-        g2d.drawString(time+"  "+ip+"  Ici:"+deskTemperature+"  "+freeMemory,0,20);
+        freeMemory="RAM "+freeMemory+" Mio libres";
+
+        g2d.setFont(littleFont);
+
+        String line1=time+" \u2013 "+ip+" \u2013 "+freeMemory;
+        int line1Width=(int)Math.ceil(g2d.getFont().getStringBounds(line1,g2d.getFontRenderContext()).getWidth());
+        g2d.drawString(line1,148-line1Width/2,13);
+
+        String deskTemperature;
+        if(INTERNET_ACTIVE)
+            try
+            {
+                deskTemperature=new DecimalFormat("###0.0").format(ThermometerManager.getTemperature());
+            }
+            catch(Exception e)
+            {
+                deskTemperature="?";
+            }
+        else
+            deskTemperature="23,2";
+        deskTemperature+="°C";
 
         if(currently!=null)
         {
-//            g2d.drawLine(0,24,250,24);
-//            g2d.drawLine(0,25,250,25);
+            String line2=currently.getSummary();
+            int line2Width=(int)Math.ceil(g2d.getFont().getStringBounds(line2,g2d.getFontRenderContext()).getWidth());
 
-            g2d.setFont(heavilyCondensedInfoFont);
+            g2d.drawImage(Icons.getIcon(currently.getIcon()),Math.max(0,148-(line2Width+32)/2),18,null);
 
-            g2d.drawImage(Icons.getIcon(currently.getIcon()),0,32,null);
-
-            String summary=currently.getSummary();
-            g2d.drawString(summary,32,44);
-
-            g2d.setFont(infoFont);
+            g2d.drawString(line2,32+Math.max(0,148-(line2Width+32)/2),30);
 
             String temperature=new DecimalFormat("###0.0").format(currently.getTemperature())+"°C";
 
             String humidity=new DecimalFormat("###0").format(currently.getHumidity()*100d)+"%";
 
-            String dewPoint=new DecimalFormat("###0.0").format(currently.getDewPoint())+"°C";
-            g2d.drawString("Ext:"+temperature+"  "+humidity+"  PdR:"+dewPoint,0,64);
+            g2d.setFont(bigFont);
 
-            String precipIntensity=new DecimalFormat("###0.0").format(currently.getPrecipIntensity())+"mm/h";
+            String line3="Int: "+deskTemperature+" Ext: "+temperature+" "+humidity;
+            int line3Width=(int)Math.ceil(g2d.getFont().getStringBounds(line3,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(line3,148-line3Width/2,54);
+
+            String precipIntensity=new DecimalFormat("###0.0").format(currently.getPrecipIntensity())+" mm/h";
 
             String precipProbability=new DecimalFormat("###0").format(currently.getPrecipProbability()*100d)+"%";
-            String rainString="Pluie:"+precipIntensity+"  Prob:"+precipProbability;
-            int rainStringWidth=(int)Math.ceil(infoFont.getStringBounds(rainString,g2d.getFontRenderContext()).getWidth());
-            g2d.drawString(rainString,0,84);
+            String line4="Pluie: "+precipIntensity+" @ "+precipProbability;
+            int line4Width=(int)Math.ceil(g2d.getFont().getStringBounds(line4,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(line4,148-(line4Width+26)/2,77);
 
-            g2d.fillOval(rainStringWidth+3,68,18,18);
-            g2d.setColor(Color.WHITE);
-            g2d.fillArc(rainStringWidth+5,70,14,14,90,(int)(360d-currently.getPrecipProbability()*360d));
-            g2d.setColor(Color.BLACK);
+            drawCheese(g2d,line4Width+15+148-(line4Width+26)/2,67,currently.getPrecipProbability());
 
-            String wind=new DecimalFormat("###0").format(currently.getWindSpeed())+"~"+new DecimalFormat("###0").format(currently.getWindGust())+"km/h";
+            String wind=new DecimalFormat("###0").format(currently.getWindSpeed())+"~"+new DecimalFormat("###0").format(currently.getWindGust())+" km/h";
 
             String windBearing=convertWindAngle(currently.getWindBearing());
 
-            String windString="Vent:"+wind+"  Dir:"+windBearing;
-            int windStringWidth=(int)Math.ceil(infoFont.getStringBounds(windString,g2d.getFontRenderContext()).getWidth());
-            g2d.drawString(windString,0,104);
+            String line5String="Vent: "+wind+" "+windBearing;
+            int line5Width=(int)Math.ceil(g2d.getFont().getStringBounds(line5String,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(line5String,148-(line5Width+23)/2,100);
 
-            g2d.setStroke(new BasicStroke(2.5f));
-            g2d.drawLine(
-                    windStringWidth+12+(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*8d),
-                    98-(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*8d),
-                    windStringWidth+12-(int)(Math.sin((double)currently.getWindBearing()*Math.PI/180d)*6d),
-                    98+(int)(Math.cos((double)currently.getWindBearing()*Math.PI/180d)*6d)
-            );
-            Path2D path=new Path2D.Double();
-            path.moveTo(
-                    (double)windStringWidth+12d-Math.sin((double)currently.getWindBearing()*Math.PI/180d)*10d,
-                    98d+Math.cos((double)currently.getWindBearing()*Math.PI/180d)*10d
-            );
-            path.lineTo(
-                    (double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d,
-                    98d+Math.cos((double)(currently.getWindBearing()+90)*Math.PI/180d)*5d
-            );
-            path.lineTo(
-                    (double)windStringWidth+12d-Math.sin((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d,
-                    98d+Math.cos((double)(currently.getWindBearing()-90)*Math.PI/180d)*5d
-            );
-            path.closePath();
-            g2d.fill(path);
+            drawArrow(g2d,line5Width+12+148-(line5Width+23)/2,90,currently.getWindBearing());
 
-            g2d.setFont(slightlyCondensedInfoFont);
-
-            String pressure=new DecimalFormat("###0.0").format(currently.getPressure())+"hPa";
-
-            String uvIndex=new DecimalFormat("###0").format(currently.getUvIndex());
+            String pressure=new DecimalFormat("###0.0").format(currently.getPressure())+" hPa";
 
             String cloudCover=new DecimalFormat("###0").format(currently.getCloudCover()*100d)+"%";
-            String addString=pressure+"  UV:"+uvIndex+"  Nuag:"+cloudCover;
-            int addStringWidth=(int)Math.ceil(slightlyCondensedInfoFont.getStringBounds(addString,g2d.getFontRenderContext()).getWidth());
-            g2d.drawString(addString,0,124);
+            String line6=pressure+" Nuages: "+cloudCover;
+            int line6Width=(int)Math.ceil(g2d.getFont().getStringBounds(line6,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(line6,148-(line6Width+26)/2,123);
 
-            g2d.fillOval(addStringWidth+3,108,18,18);
-            g2d.setColor(Color.WHITE);
-            g2d.fillArc(addStringWidth+5,110,14,14,90,(int)(360d-currently.getCloudCover()*360d));
+            drawCheese(g2d,line6Width+15+148-(line6Width+26)/2,113,currently.getCloudCover());
         }
+    }
+
+    private static void drawCheese(Graphics2D g2d,int centerX,int centerY,double ratio)
+    {
+        g2d.setColor(Color.BLACK);
+        g2d.fillOval(centerX-11,centerY-11,22,22);
+        g2d.setColor(Color.WHITE);
+        g2d.fillArc(centerX-9,centerY-9,18,18,90,(int)(360d-ratio*360d));
+        g2d.setColor(Color.BLACK);
+    }
+
+    private static void drawArrow(Graphics2D g2d,int centerX,int centerY,int angle)
+    {
+        g2d.setStroke(new BasicStroke(3f));
+        g2d.draw(new Line2D.Double(
+                (double)centerX+Math.sin((double)angle*Math.PI/180d)*8d,
+                (double)centerY-Math.cos((double)angle*Math.PI/180d)*8d,
+                (double)centerX-Math.sin((double)angle*Math.PI/180d)*6d,
+                (double)centerY+Math.cos((double)angle*Math.PI/180d)*6d
+        ));
+        Path2D path=new Path2D.Double();
+        path.moveTo(
+                (double)centerX-Math.sin((double)angle*Math.PI/180d)*10d,
+                (double)centerY+Math.cos((double)angle*Math.PI/180d)*10d
+        );
+        path.lineTo(
+                (double)centerX-Math.sin((double)(angle+90)*Math.PI/180d)*7d,
+                (double)centerY+Math.cos((double)(angle+90)*Math.PI/180d)*7d
+        );
+        path.lineTo(
+                (double)centerX-Math.sin((double)(angle-90)*Math.PI/180d)*7d,
+                (double)centerY+Math.cos((double)(angle-90)*Math.PI/180d)*7d
+        );
+        path.closePath();
+        g2d.fill(path);
     }
 
     protected String getDebugImageFileName()

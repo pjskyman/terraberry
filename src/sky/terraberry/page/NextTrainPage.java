@@ -2,7 +2,6 @@ package sky.terraberry.page;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -101,19 +100,18 @@ public class NextTrainPage extends AbstractSinglePage
         }
 
         if(errorC)
-            for(int x=0;x<122;x++)
+            for(int x=0;x<146;x++)
                 for(int y=0;y<128;y++)
                     if((x+(y-1)/2)%2==0)
                         g2d.drawLine(x,y,x,y);
         if(errorR)
-            for(int x=122;x<250;x++)
+            for(int x=146;x<250;x++)
                 for(int y=0;y<128;y++)
                     if((x+(y-1)/2)%2==0)
                         g2d.drawLine(x,y,x,y);
 
-        Font bigTimeFont=BALOO_FONT.deriveFont(30f);
-        Font bigMissionFont=BALOO_FONT.deriveFont(20f).deriveFont(AffineTransform.getScaleInstance(.85d,1d));
-        int currentY=5;
+        Font timeFont=FREDOKA_ONE_FONT.deriveFont(32f);
+        Font missionFont=FREDOKA_ONE_FONT.deriveFont(20f);
         if(nextTrainsC.stream().anyMatch(train->train.getMission().startsWith("E")))
         {
             List<Train> list=new ArrayList<Train>();
@@ -123,38 +121,30 @@ public class NextTrainPage extends AbstractSinglePage
             nextTrainsC.clear();
             nextTrainsC.addAll(list);
         }
-        for(int i=0;i<nextTrainsC.size();i++)
+        drawTrainList(g2d,nextTrainsC,0,timeFont,missionFont);
+        drawTrainList(g2d,nextTrainsR,146,timeFont,missionFont);
+    }
+
+    private static void drawTrainList(Graphics2D g2d,List<Train> trains,int baseX,Font timeFont,Font missionFont)
+    {
+        for(int i=0;i<trains.size();i++)
         {
-            Train trainC=nextTrainsC.get(i);
-            g2d.setFont(bigTimeFont);
-            String time=trainC.getTime()+(trainC.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
-            int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-            g2d.drawString(time,1,currentY+20);
-            if(trainC.getAdditionalMessage().toLowerCase().contains("suppr"))
+            int y=(i+1)*26-2;
+            Train train=trains.get(i);
+            g2d.setFont(timeFont);
+            String time=train.getTime()+(train.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
+            int timeWidth=(int)Math.ceil(g2d.getFont().getStringBounds(time,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(time,baseX+1,y);
+            g2d.setFont(missionFont);
+            String mission=train.getMission();
+            int missionWidth=(int)Math.ceil(g2d.getFont().getStringBounds(mission,g2d.getFontRenderContext()).getWidth());
+            g2d.drawString(mission,baseX+1+timeWidth+3,y-3);
+            if(train.getAdditionalMessage().toLowerCase().contains("suppr"))
             {
-                g2d.drawLine(0,currentY+20-11,timeWidth+2,currentY+20-11);
-                g2d.drawLine(0,currentY+20-10,timeWidth+2,currentY+20-10);
-                g2d.drawLine(0,currentY+20-9,timeWidth+2,currentY+20-9);
+                g2d.drawLine(baseX,y-11,baseX+timeWidth+2+missionWidth+3,y-11);
+                g2d.drawLine(baseX,y-10,baseX+timeWidth+2+missionWidth+3,y-10);
+                g2d.drawLine(baseX,y-9,baseX+timeWidth+2+missionWidth+3,y-9);
             }
-            g2d.setFont(bigMissionFont);
-            g2d.drawString(trainC.getMission(),1+timeWidth+3,currentY+20-3);
-            currentY+=20;
-        }
-        for(int i=0;i<nextTrainsR.size();i++)
-        {
-            Train trainR=nextTrainsR.get(i);
-            g2d.setFont(bigTimeFont);
-            String time=trainR.getTime()+(trainR.getAdditionalMessage().toLowerCase().contains("retar")?"*":"");
-            int timeWidth=(int)Math.ceil(bigTimeFont.getStringBounds(time,g2d.getFontRenderContext()).getWidth());
-            g2d.drawString(time,123,20*(i+1)+5);
-            if(trainR.getAdditionalMessage().toLowerCase().contains("suppr"))
-            {
-                g2d.drawLine(122,20*(i+1)+5-11,122+timeWidth+2,20*(i+1)+5-11);
-                g2d.drawLine(122,20*(i+1)+5-10,122+timeWidth+2,20*(i+1)+5-10);
-                g2d.drawLine(122,20*(i+1)+5-9,122+timeWidth+2,20*(i+1)+5-9);
-            }
-            g2d.setFont(bigMissionFont);
-            g2d.drawString(trainR.getMission(),123+timeWidth+3,20*(i+1)+2);
         }
     }
 
