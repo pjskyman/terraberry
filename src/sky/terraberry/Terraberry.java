@@ -1,6 +1,7 @@
 package sky.terraberry;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.SwingUtilities;
 import sky.program.Duration;
 import sky.terraberry.page.MainMenuPage;
 
@@ -20,6 +21,28 @@ public final class Terraberry
             AtomicInteger currentModificationCount=new AtomicInteger(currentScreen.getModificationCount());
             long lastCompleteRefresh=System.currentTimeMillis();
             EpaperScreenManager.display(currentScreen,RefreshType.TOTAL_REFRESH);
+            SwitchManager.addSwitchListener(new SwitchListener()
+            {
+                public void switched()
+                {
+                    Logger.LOGGER.info("Switch has been pressed");
+                    SwingUtilities.invokeLater(this::changePage);
+                }
+
+                private synchronized void changePage()
+                {
+                    mainMenuPage.rotated(RotationDirection.CLOCKWISE);
+                    try
+                    {
+                        Thread.sleep(1000L);
+                    }
+                    catch(InterruptedException e)
+                    {
+                    }
+                    mainMenuPage.clicked(false);
+                    Logger.LOGGER.info("Page change has been completed");
+                }
+            });
             Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is now ready!");
             new Thread("ledUpdater")
             {
@@ -78,26 +101,6 @@ public final class Terraberry
                     }
                 }
             }.start();
-            new Thread("pageSelector")
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        Thread.sleep(Duration.of(10).second());
-                        while(true)
-                        {
-                            mainMenuPage.rotated(RotationDirection.CLOCKWISE);
-                            mainMenuPage.clicked(false);
-                            Thread.sleep(Duration.of(10).second());
-                        }
-                    }
-                    catch(InterruptedException e)
-                    {
-                    }
-                }
-            }.start();
             try
             {
                 while(true)
@@ -130,7 +133,8 @@ public final class Terraberry
         }
         catch(Exception e)
         {
-            Logger.LOGGER.error("Unknown error ("+e.toString()+")");
+            Logger.LOGGER.error("Unknown error");
+            e.printStackTrace();
         }
     }
 }
