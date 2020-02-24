@@ -43,6 +43,28 @@ public final class Terraberry
                     Logger.LOGGER.info("Page change has been completed");
                 }
             });
+            SwitchManager.addSwitch2Listener(new SwitchListener()
+            {
+                public void switched()
+                {
+                    Logger.LOGGER.info("Switch has been pressed");
+                    SwingUtilities.invokeLater(this::changePage);
+                }
+
+                private synchronized void changePage()
+                {
+                    mainMenuPage.rotated(RotationDirection.COUNTERCLOCKWISE);
+                    try
+                    {
+                        Thread.sleep(1000L);
+                    }
+                    catch(InterruptedException e)
+                    {
+                    }
+                    mainMenuPage.clicked(false);
+                    Logger.LOGGER.info("Page change has been completed");
+                }
+            });
             Logger.LOGGER.info(Terraberry.class.getSimpleName()+" is now ready!");
             new Thread("ledUpdater")
             {
