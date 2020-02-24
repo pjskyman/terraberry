@@ -11,37 +11,66 @@ import java.util.List;
 
 public class SwitchManager
 {
-    private static final GpioPinDigitalInput SWITCH;
-    private static final List<SwitchListener> SWITCH_LISTENERS;
+    private static final GpioPinDigitalInput SWITCH1;
+    private static final GpioPinDigitalInput SWITCH2;
+    private static final List<SwitchListener> SWITCH_LISTENERS1;
+    private static final List<SwitchListener> SWITCH_LISTENERS2;
 
     static
     {
-        GpioPinDigitalInput zwitch=null;
+        GpioPinDigitalInput zwitch1=null;
         try
         {
-            zwitch=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_02);
-            zwitch.addListener(new GpioPinListenerDigital()
+            zwitch1=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_02);
+            zwitch1.addListener(new GpioPinListenerDigital()
             {
                 public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
                 {
 //                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
                     if(event.getState()==PinState.HIGH)
-                        SWITCH_LISTENERS.forEach(SwitchListener::switched);
+                        SWITCH_LISTENERS1.forEach(SwitchListener::switched);
                 }
             });
         }
         catch(Exception e)
         {
-            Logger.LOGGER.error("Unable to get click pin ("+e.toString()+")");
+            Logger.LOGGER.error("Unable to get switch 1 pin ("+e.toString()+")");
             e.printStackTrace();
             System.exit(1);
         }
-        SWITCH=zwitch;
-        SWITCH_LISTENERS=new ArrayList<>();
+        SWITCH1=zwitch1;
+        SWITCH_LISTENERS1=new ArrayList<>();
+        GpioPinDigitalInput zwitch2=null;
+        try
+        {
+            zwitch2=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_07);//TODO à vérifier
+            zwitch2.addListener(new GpioPinListenerDigital()
+            {
+                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
+                {
+//                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
+                    if(event.getState()==PinState.HIGH)
+                        SWITCH_LISTENERS2.forEach(SwitchListener::switched);
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            Logger.LOGGER.error("Unable to get switch 2 pin ("+e.toString()+")");
+            e.printStackTrace();
+            System.exit(1);
+        }
+        SWITCH2=zwitch2;
+        SWITCH_LISTENERS2=new ArrayList<>();
     }
 
-    public static void addSwitchListener(SwitchListener switchListener)
+    public static void addSwitchListener1(SwitchListener switchListener)
     {
-        SWITCH_LISTENERS.add(switchListener);
+        SWITCH_LISTENERS1.add(switchListener);
+    }
+
+    public static void addSwitchListener2(SwitchListener switchListener)
+    {
+        SWITCH_LISTENERS2.add(switchListener);
     }
 }
