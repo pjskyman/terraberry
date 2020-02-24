@@ -8,6 +8,7 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import java.util.ArrayList;
 import java.util.List;
+import sky.program.Duration;
 
 public class SwitchManager
 {
@@ -18,49 +19,73 @@ public class SwitchManager
 
     static
     {
-        GpioPinDigitalInput zwitch1=null;
+        GpioPinDigitalInput switch1=null;
         try
         {
-            zwitch1=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_02);
-            zwitch1.addListener(new GpioPinListenerDigital()
-            {
-                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
+            for(int i=0;i<10;i++)
+                try
                 {
-//                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
-                    if(event.getState()==PinState.HIGH)
-                        SWITCH_LISTENERS1.forEach(SwitchListener::switched);
+                    switch1=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_02);
+                    switch1.addListener(new GpioPinListenerDigital()
+                    {
+                        public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
+                        {
+//                            System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
+                            if(event.getState()==PinState.HIGH)
+                                SWITCH_LISTENERS1.forEach(SwitchListener::switched);
+                        }
+                    });
+                    break;
                 }
-            });
+                catch(RuntimeException e)
+                {
+                    Logger.LOGGER.error("Unable to get switch 1 pin ("+e.toString()+")");
+                    Thread.sleep(Duration.of(200).millisecond());
+                }
         }
-        catch(Exception e)
+        catch(InterruptedException e)
         {
-            Logger.LOGGER.error("Unable to get switch 1 pin ("+e.toString()+")");
-            e.printStackTrace();
+        }
+        if(switch1==null)
+        {
+            Logger.LOGGER.error("Unable to open the GPIO pin 2 after 10 attempts");
             System.exit(1);
         }
-        SWITCH1=zwitch1;
+        SWITCH1=switch1;
         SWITCH_LISTENERS1=new ArrayList<>();
-        GpioPinDigitalInput zwitch2=null;
+        GpioPinDigitalInput switch2=null;
         try
         {
-            zwitch2=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_07);//TODO à vérifier
-            zwitch2.addListener(new GpioPinListenerDigital()
-            {
-                public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
+            for(int i=0;i<10;i++)
+                try
                 {
-//                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
-                    if(event.getState()==PinState.HIGH)
-                        SWITCH_LISTENERS2.forEach(SwitchListener::switched);
+                    switch2=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_07);//TODO à vérifier, et accorder avec la sortie log ci-dessous
+                    switch2.addListener(new GpioPinListenerDigital()
+                    {
+                        public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
+                        {
+        //                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
+                            if(event.getState()==PinState.HIGH)
+                                SWITCH_LISTENERS2.forEach(SwitchListener::switched);
+                        }
+                    });
+                    break;
                 }
-            });
+                catch(RuntimeException e)
+                {
+                    Logger.LOGGER.error("Unable to get switch 2 pin ("+e.toString()+")");
+                    Thread.sleep(Duration.of(200).millisecond());
+                }
         }
-        catch(Exception e)
+        catch(InterruptedException e)
         {
-            Logger.LOGGER.error("Unable to get switch 2 pin ("+e.toString()+")");
-            e.printStackTrace();
+        }
+        if(switch2==null)
+        {
+            Logger.LOGGER.error("Unable to open the GPIO pin 7 after 10 attempts");
             System.exit(1);
         }
-        SWITCH2=zwitch2;
+        SWITCH2=switch2;
         SWITCH_LISTENERS2=new ArrayList<>();
     }
 
