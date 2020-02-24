@@ -63,7 +63,7 @@ public class ThermometerManager
                 temperature-=8192;
 //            Logger.LOGGER.info("Temperature is "+temperature*.0625d+"°C");
             double rawTemp=(double)temperature*.0625d;
-            return rawTemp;
+            return rawTemp-2.2d;
         }
         catch(IOException e)
         {
