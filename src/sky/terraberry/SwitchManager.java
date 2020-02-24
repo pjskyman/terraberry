@@ -64,7 +64,7 @@ public class SwitchManager
                     {
                         public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
                         {
-        //                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
+//                            System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
                             if(event.getState()==PinState.HIGH)
                                 SWITCH2_LISTENERS.forEach(SwitchListener::switched);
                         }
