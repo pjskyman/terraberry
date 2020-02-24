@@ -14,8 +14,8 @@ public class SwitchManager
 {
     private static final GpioPinDigitalInput SWITCH1;
     private static final GpioPinDigitalInput SWITCH2;
-    private static final List<SwitchListener> SWITCH_LISTENERS1;
-    private static final List<SwitchListener> SWITCH_LISTENERS2;
+    private static final List<SwitchListener> SWITCH1_LISTENERS;
+    private static final List<SwitchListener> SWITCH2_LISTENERS;
 
     static
     {
@@ -32,7 +32,7 @@ public class SwitchManager
                         {
 //                            System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
                             if(event.getState()==PinState.HIGH)
-                                SWITCH_LISTENERS1.forEach(SwitchListener::switched);
+                                SWITCH1_LISTENERS.forEach(SwitchListener::switched);
                         }
                     });
                     break;
@@ -52,7 +52,7 @@ public class SwitchManager
             System.exit(1);
         }
         SWITCH1=switch1;
-        SWITCH_LISTENERS1=new ArrayList<>();
+        SWITCH1_LISTENERS=new ArrayList<>();
         GpioPinDigitalInput switch2=null;
         try
         {
@@ -66,7 +66,7 @@ public class SwitchManager
                         {
         //                    System.out.println("click "+event.getState()+" "+System.currentTimeMillis());
                             if(event.getState()==PinState.HIGH)
-                                SWITCH_LISTENERS2.forEach(SwitchListener::switched);
+                                SWITCH2_LISTENERS.forEach(SwitchListener::switched);
                         }
                     });
                     break;
@@ -86,16 +86,16 @@ public class SwitchManager
             System.exit(1);
         }
         SWITCH2=switch2;
-        SWITCH_LISTENERS2=new ArrayList<>();
+        SWITCH2_LISTENERS=new ArrayList<>();
     }
 
-    public static void addSwitchListener1(SwitchListener switchListener)
+    public static void addSwitch1Listener(SwitchListener switchListener)
     {
-        SWITCH_LISTENERS1.add(switchListener);
+        SWITCH1_LISTENERS.add(switchListener);
     }
 
-    public static void addSwitchListener2(SwitchListener switchListener)
+    public static void addSwitch2Listener(SwitchListener switchListener)
     {
-        SWITCH_LISTENERS2.add(switchListener);
+        SWITCH2_LISTENERS.add(switchListener);
     }
 }

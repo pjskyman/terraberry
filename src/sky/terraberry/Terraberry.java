@@ -21,7 +21,7 @@ public final class Terraberry
             AtomicInteger currentModificationCount=new AtomicInteger(currentScreen.getModificationCount());
             long lastCompleteRefresh=System.currentTimeMillis();
             EpaperScreenManager.display(currentScreen,RefreshType.TOTAL_REFRESH);
-            SwitchManager.addSwitchListener(new SwitchListener()
+            SwitchManager.addSwitch1Listener(new SwitchListener()
             {
                 public void switched()
                 {
