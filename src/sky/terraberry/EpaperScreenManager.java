@@ -88,6 +88,7 @@ public class EpaperScreenManager
         (byte)0x00,
         (byte)0x00
     };
+    private static final Object THIS=new Object();
 
     static
     {
@@ -136,6 +137,7 @@ public class EpaperScreenManager
     {
         long now=System.currentTimeMillis();
         PixelMatrix currentPixelMatrix=screen.getPixelMatrix();
+        currentPixelMatrix.addReferer(THIS);
         int iMin;
         int iMax;
         int jMin;
@@ -190,6 +192,8 @@ public class EpaperScreenManager
         long now2=System.currentTimeMillis();
         displayImpl(pixelStates,iMin,jMin,refreshType);
         long subtime=System.currentTimeMillis()-now2;
+        if(pixelMatrices[pixelMatrixIndex]!=null)
+            pixelMatrices[pixelMatrixIndex].removeReferer(THIS);
         pixelMatrices[pixelMatrixIndex]=currentPixelMatrix;
         int tempPixelMatrixIndex=pixelMatrixIndex;
         pixelMatrixIndex=++pixelMatrixIndex%pixelMatrices.length;

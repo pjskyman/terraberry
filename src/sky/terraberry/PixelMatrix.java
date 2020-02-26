@@ -2,14 +2,27 @@ package sky.terraberry;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PixelMatrix
 {
     private final byte[] data;
+    private final List<Object> referers;
+    private long lastRead;
 
     public PixelMatrix()
     {
+        this(null);
+    }
+
+    public PixelMatrix(Object referer)
+    {
         data=new byte[EpaperScreenManager.LITTLE_WIDTH*EpaperScreenManager.BIG_HEIGHT/4];
+        referers=new ArrayList<>();
+        if(referer!=null)
+            referers.add(referer);
+        lastRead=System.currentTimeMillis();
     }
 
     public void initializeBlank()
@@ -24,6 +37,7 @@ public class PixelMatrix
 
     private void initialize(PixelState pixelState)
     {
+        lastRead=System.currentTimeMillis();
         int index;
         int address;
         int offset;
@@ -52,6 +66,7 @@ public class PixelMatrix
     {
         if(image.getWidth()!=EpaperScreenManager.BIG_HEIGHT||image.getHeight()!=EpaperScreenManager.LITTLE_WIDTH)
             throw new IllegalArgumentException("Image has wrong dimensions");
+        lastRead=System.currentTimeMillis();
         for(int i=0;i<data.length;i++)
             data[i]=(byte)0;
         WritableRaster sourceRaster=image.getRaster();
@@ -86,6 +101,7 @@ public class PixelMatrix
 
     public void setContentWithIncrust(PixelMatrix content,PixelMatrix incrust)
     {
+        lastRead=System.currentTimeMillis();
         byte b1;
         byte b2;
         int i11;
@@ -134,6 +150,7 @@ public class PixelMatrix
 
     public boolean arePixelsEqual(PixelMatrix anotherPixelMatrix,int x,int y)
     {
+        lastRead=System.currentTimeMillis();
         int index=y*EpaperScreenManager.BIG_HEIGHT+x;
         int address=index/4;
         int offset=index%4;
@@ -168,6 +185,7 @@ public class PixelMatrix
 
     public PixelState getPixelState(int x,int y)
     {
+        lastRead=System.currentTimeMillis();
         int index=y*EpaperScreenManager.BIG_HEIGHT+x;
         int address=index/4;
         int offset=index%4;
@@ -184,5 +202,28 @@ public class PixelMatrix
                 else
                     value=Byte.toUnsignedInt(b)>>6;
         return value==0?PixelState.BLACK:value==1?PixelState.WHITE:PixelState.TRANSPARENT;
+    }
+
+    public boolean isReferenced()
+    {
+        return !referers.isEmpty();
+    }
+
+    public PixelMatrix addReferer(Object referer)
+    {
+        if(referer!=null&&!referers.contains(referer))
+            referers.add(referer);
+        return this;
+    }
+
+    public PixelMatrix removeReferer(Object referer)
+    {
+        referers.remove(referer);
+        return this;
+    }
+
+    public long getLastRead()
+    {
+        return lastRead;
     }
 }
