@@ -39,7 +39,7 @@ public class SwitchManager
                 }
                 catch(RuntimeException e)
                 {
-                    Logger.LOGGER.error("Unable to get switch 1 pin ("+e.toString()+")");
+                    Logger.LOGGER.error("Unable to open switch 1 pin ("+e.toString()+")");
                     Thread.sleep(Duration.of(200).millisecond());
                 }
         }
@@ -73,7 +73,7 @@ public class SwitchManager
                 }
                 catch(RuntimeException e)
                 {
-                    Logger.LOGGER.error("Unable to get switch 2 pin ("+e.toString()+")");
+                    Logger.LOGGER.error("Unable to open switch 2 pin ("+e.toString()+")");
                     Thread.sleep(Duration.of(200).millisecond());
                 }
         }

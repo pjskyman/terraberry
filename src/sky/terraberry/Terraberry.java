@@ -25,7 +25,7 @@ public final class Terraberry
             {
                 public void switched()
                 {
-                    Logger.LOGGER.info("Switch has been pressed");
+                    Logger.LOGGER.info("Button 1 has been pressed");
                     SwingUtilities.invokeLater(this::changePage);
                 }
 
@@ -47,7 +47,7 @@ public final class Terraberry
             {
                 public void switched()
                 {
-                    Logger.LOGGER.info("Switch has been pressed");
+                    Logger.LOGGER.info("Button 2 has been pressed");
                     SwingUtilities.invokeLater(this::changePage);
                 }
 
