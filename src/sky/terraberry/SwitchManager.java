@@ -59,7 +59,7 @@ public class SwitchManager
             for(int i=0;i<10;i++)
                 try
                 {
-                    switch2=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_25);
+                    switch2=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_27);
                     switch2.addListener(new GpioPinListenerDigital()
                     {
                         public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event)
@@ -82,7 +82,7 @@ public class SwitchManager
         }
         if(switch2==null)
         {
-            Logger.LOGGER.error("Unable to open the GPIO pin 25 after 10 attempts");
+            Logger.LOGGER.error("Unable to open the GPIO pin 27 after 10 attempts");
             System.exit(1);
         }
         SWITCH2=switch2;
