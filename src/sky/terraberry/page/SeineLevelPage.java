@@ -37,7 +37,7 @@ public class SeineLevelPage extends AbstractSinglePage
     {
         if(INTERNET_ACTIVE)
         {
-            HttpURLConnection connection=(HttpURLConnection)new URL("http://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr.xml?code_entite=F700000103&size=1").openConnection();
+            HttpURLConnection connection=(HttpURLConnection)new URL("http://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr.xml?code_entite=F700000103&grandeur_hydro=H&size=1").openConnection();
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setRequestMethod("GET");
