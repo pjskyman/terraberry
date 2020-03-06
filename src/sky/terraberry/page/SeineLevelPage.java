@@ -1,15 +1,15 @@
 package sky.terraberry.page;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 import sky.program.Duration;
 
 public class SeineLevelPage extends AbstractSinglePage
@@ -37,7 +37,7 @@ public class SeineLevelPage extends AbstractSinglePage
     {
         if(INTERNET_ACTIVE)
         {
-            HttpURLConnection connection=(HttpURLConnection)new URL("http://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr.xml?code_entite=F700000103&grandeur_hydro=H&size=1").openConnection();
+            HttpURLConnection connection=(HttpURLConnection)new URL("http://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=F700000103&grandeur_hydro=H&size=1").openConnection();
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setRequestMethod("GET");
@@ -58,16 +58,11 @@ public class SeineLevelPage extends AbstractSinglePage
             String rawContent=stringBuilder.toString();
             if(!rawContent.isEmpty())
             {
-                Element hydrometrieElement=new SAXBuilder().build(new StringReader(rawContent)).getRootElement();
-                Namespace namespace=hydrometrieElement.getNamespace();
-                Element DonneesElement=hydrometrieElement.getChild("Donnees",namespace);
-                Element SeriesElement=DonneesElement.getChild("Series",namespace);
-                Element SerieElement=SeriesElement.getChild("Serie",namespace);
-                Element ObssHydroElement=SerieElement.getChild("ObssHydro",namespace);
-                Element ObsHydroElement=ObssHydroElement.getChild("ObsHydro",namespace);
-                Element ResObsHydroElement=ObsHydroElement.getChild("ResObsHydro",namespace);
-                String levelString=ResObsHydroElement.getText();
-                level=Double.parseDouble(levelString)/1000d;
+                JsonObject element=new JsonParser().parse(rawContent).getAsJsonObject();
+                JsonArray dataArray=element.getAsJsonArray("data");
+                JsonObject data0Object=dataArray.get(0).getAsJsonObject();
+                JsonPrimitive resultat_obsPrimitive=data0Object.get("resultat_obs").getAsJsonPrimitive();
+                level=resultat_obsPrimitive.getAsDouble()/1000d;
             }
             else
                 level=0d;
@@ -87,10 +82,5 @@ public class SeineLevelPage extends AbstractSinglePage
     protected String getDebugImageFileName()
     {
         return "seine.png";
-    }
-
-    public static void main(String[] args)
-    {
-        new SeineLevelPage(null).potentiallyUpdate();
     }
 }
