@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.BufferedReader;
@@ -57,20 +58,24 @@ public class SeineLevelPage extends AbstractSinglePage
             connection=null;
             String rawContent=stringBuilder.toString();
             if(!rawContent.isEmpty())
-            {
-                JsonObject element=new JsonParser().parse(rawContent).getAsJsonObject();
-                JsonArray dataArray=element.getAsJsonArray("data");
-                JsonObject data0Object=dataArray.get(0).getAsJsonObject();
-                JsonPrimitive resultat_obsPrimitive=data0Object.get("resultat_obs").getAsJsonPrimitive();
-                level=resultat_obsPrimitive.getAsDouble()/1000d;
-            }
+                try
+                {
+                    JsonObject element=new JsonParser().parse(rawContent).getAsJsonObject();
+                    JsonArray dataArray=element.getAsJsonArray("data");
+                    JsonObject data0Object=dataArray.get(0).getAsJsonObject();
+                    JsonPrimitive resultat_obsPrimitive=data0Object.get("resultat_obs").getAsJsonPrimitive();
+                    level=resultat_obsPrimitive.getAsDouble()/1000d;
+                }
+                catch(JsonSyntaxException e)
+                {
+                    e.printStackTrace();
+                    level=0d;
+                }
             else
                 level=0d;
         }
         else
-        {
             level=0d;
-        }
 
         Font font=FREDOKA_ONE_FONT.deriveFont(72f);
         g2d.setFont(font);
