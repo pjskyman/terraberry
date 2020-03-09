@@ -10,6 +10,7 @@ public class MainMenuPage extends AbstractMenuPage
         subpages.add(new NextTrainPage(this).potentiallyUpdate());
         subpages.add(new WeatherPage(this).potentiallyUpdate());
         subpages.add(new SeineLevelPage(this).potentiallyUpdate());
+        subpages.add(new MoonPage(this).potentiallyUpdate());
         currentPageRank=1;
     }
 
