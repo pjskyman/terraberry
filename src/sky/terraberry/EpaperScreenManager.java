@@ -114,7 +114,7 @@ public class EpaperScreenManager
             DEVICE=device;
             Logger.LOGGER.info("SPI device successfully initialized");
             RESET=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_00,PinState.HIGH);
-            DC=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);
+            DC=GpioFactory.getInstance().provisionDigitalOutputPin(RaspiPin.GPIO_06,PinState.LOW);//TODO parfois ces lignes merdouillent, il faut les sécuriser !
             DC.setShutdownOptions(Boolean.TRUE,PinState.LOW);
             BUSY=GpioFactory.getInstance().provisionDigitalInputPin(RaspiPin.GPIO_05);
 //            BUSY.addListener(new GpioPinListenerDigital()
